@@ -1,1 +1,3961 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V4SE B1 — App 2 — Reflex Training Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F5FB;
+    --panel:#FFFFFF;
+    --panel-2:#F4F6FC;
+    --line:#E2E6F0;
+    --text:#1C2333;
+    --muted:#6B7488;
+    --primary:#2F5FE0;
+    --primary-2:#547BF5;
+    --gold:#B9791A;
+    --gold-bg:#FFF6E5;
+    --speaking:#E2601F;
+    --listening:#0E86A8;
+    --reading:#7141C9;
+    --writing:#12915E;
+    --bad:#D23A50;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:
+    radial-gradient(1100px 560px at 82% -8%, #E7ECFB 0%, transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, #EEF1FB 0%, transparent 55%),
+    var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+  }
+  .app{max-width:720px;margin:0 auto;padding:20px 16px 40px;}
+
+  header{display:flex;flex-direction:column;gap:14px;margin-bottom:18px;}
+  .eyebrow{font-family:'Inter',system-ui,sans-serif;font-size:11px;letter-spacing:.18em;color:var(--primary);text-transform:uppercase;}
+  h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.01em;color:var(--text);}
+
+  .skills-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+  .skill-chip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .skill-chip .lbl{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:6px;font-family:'Inter',system-ui,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+  .skill-chip .track{height:6px;border-radius:4px;background:#EEF1F8;overflow:hidden;}
+  .skill-chip .fill{height:100%;border-radius:4px;transition:width .4s ease;}
+  .skill-chip.speaking{background:rgba(226,96,31,.08);border-color:rgba(226,96,31,.28);}
+  .skill-chip.speaking .lbl{color:var(--speaking);}
+  .skill-chip.speaking .fill{background:var(--speaking);}
+  .skill-chip.listening{background:rgba(14,134,168,.08);border-color:rgba(14,134,168,.28);}
+  .skill-chip.listening .lbl{color:var(--listening);}
+  .skill-chip.listening .fill{background:var(--listening);}
+  .skill-chip.reading{background:rgba(113,65,201,.08);border-color:rgba(113,65,201,.28);}
+  .skill-chip.reading .lbl{color:var(--reading);}
+  .skill-chip.reading .fill{background:var(--reading);}
+  .skill-chip.writing{background:rgba(18,145,94,.08);border-color:rgba(18,145,94,.28);}
+  .skill-chip.writing .lbl{color:var(--writing);}
+  .skill-chip.writing .fill{background:var(--writing);}
+  .skill-chip.overall{background:rgba(47,95,224,.08);border-color:rgba(47,95,224,.3);}
+  .skill-chip.overall .lbl{color:var(--primary);}
+  .skill-chip.overall .fill{background:var(--primary);}
+
+  .cefr-estimate{font-size:11.5px;color:var(--muted);line-height:1.5;text-align:center;padding:2px 4px;}
+  .cefr-estimate strong{color:var(--primary);font-weight:800;}
+
+  .mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:10px 4px;border-radius:10px;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Inter',system-ui,sans-serif;}
+  .tab:hover{color:var(--text);border-color:var(--primary-2);}
+  .tab.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 6px 16px rgba(47,95,224,.25);font-weight:800;}
+
+  .hint-row{margin-bottom:16px;}
+  .hint-tab{width:100%;border-color:var(--gold);color:var(--gold);background:var(--panel);}
+  .hint-tab:hover{color:#fff;background:var(--gold);}
+  .hint-tab.on{background:var(--gold);color:#fff;box-shadow:0 6px 16px rgba(185,121,26,.25);}
+
+  .hint-panel{display:none;width:100%;background:var(--gold-bg);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;text-align:left;font-size:13px;line-height:1.55;}
+  .hint-panel.open{display:block;}
+  .hint-panel .hp-row{margin-bottom:6px;}
+  .hint-panel .hp-tag{font-family:'Inter',system-ui,sans-serif;font-size:10px;letter-spacing:.1em;color:var(--gold);margin-right:6px;font-weight:700;}
+
+  .sound-check{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;}
+  .sound-check .btn{padding:8px 14px;font-size:12px;flex:none;}
+  .sound-check .voice-tag{font-size:11.5px;line-height:1.4;}
+  .mic-level-track{width:80px;height:10px;border-radius:5px;background:#EEF1F8;border:1px solid var(--line);overflow:hidden;flex:none;}
+  .mic-level-fill{height:100%;width:0%;background:var(--writing);transition:width .06s linear;}
+
+  .check-confirm{display:flex;gap:6px;margin-left:auto;}
+  .btn.tiny{padding:5px 10px;font-size:11px;border-radius:7px;font-weight:700;}
+  .btn.tiny.ok{background:#fff;color:var(--writing);border:1px solid var(--writing);}
+  .btn.tiny.ok:hover,.btn.tiny.ok.selected{background:var(--writing);color:#fff;}
+  .btn.tiny.bad{background:#fff;color:var(--bad);border:1px solid var(--bad);}
+  .btn.tiny.bad:hover,.btn.tiny.bad.selected{background:var(--bad);color:#fff;}
+
+  .session-control{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-align:center;}
+  .session-btn{width:100%;font-size:15px;padding:13px;background:linear-gradient(135deg,var(--primary),var(--writing));}
+  .session-btn.paused{background:linear-gradient(135deg,var(--gold),var(--speaking));}
+  .session-btn:disabled{background:#C7CCDA;opacity:1;cursor:not-allowed;}
+  .session-hint{margin-top:6px;}
+
+  .pause-overlay{position:absolute;inset:0;background:rgba(243,245,251,.95);border-radius:18px;display:flex;align-items:center;justify-content:center;z-index:20;cursor:pointer;text-align:center;padding:20px;}
+  .pause-overlay-inner{font-weight:800;font-size:17px;color:var(--primary);line-height:1.5;}
+  .pause-overlay-inner span{display:block;font-weight:600;font-size:12.5px;color:var(--muted);margin-top:6px;}
+
+  .exam-row{margin-bottom:12px;}
+  .exam-tab{width:100%;background:linear-gradient(135deg,var(--primary),var(--gold));color:#fff;border:none;font-size:13px;padding:13px 10px;box-shadow:0 6px 18px rgba(47,95,224,.28);letter-spacing:.02em;}
+  .exam-tab:hover{filter:brightness(1.06);color:#fff;}
+  .exam-tab.active{outline:2px solid var(--primary);outline-offset:2px;}
+  .exam-banner{background:var(--panel);border:1px solid var(--primary);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;font-weight:800;color:var(--primary);text-align:center;font-family:'Inter',system-ui,sans-serif;}
+  .exam-breakdown{width:100%;max-width:280px;margin:14px auto 0;text-align:left;}
+  .exam-row-stat{display:flex;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--text);}
+  .exam-row-stat:last-child{border-bottom:none;}
+
+  .voice-tag{font-family:'Inter',system-ui,sans-serif;font-size:11px;color:var(--muted);min-height:14px;}
+
+  .stage{position:relative;}
+  .progress-dots{display:flex;gap:5px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--line);}
+  .dot.done{background:var(--primary);}
+  .dot.current{background:var(--text);}
+
+  .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px 22px;text-align:center;min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:16px;box-shadow:0 1px 2px rgba(20,30,60,.04), 0 10px 28px rgba(20,30,60,.05);}
+
+  .ring-wrap{position:relative;width:104px;height:104px;}
+  .ring{width:104px;height:104px;transform:rotate(-90deg);}
+  .ring-bg{fill:none;stroke:#E2E6F0;stroke-width:8;}
+  .ring-fg{fill:none;stroke:var(--primary);stroke-width:8;stroke-linecap:round;stroke-dasharray:327;stroke-dashoffset:0;transition:stroke-dashoffset linear;}
+  .ring-fg.danger{stroke:var(--bad);}
+  .ring-fg.indefinite{animation:ringPulse 1.6s ease-in-out infinite;}
+  @keyframes ringPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  .ring-time{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Inter',system-ui,sans-serif;font-size:26px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
+  .ring-time.indefinite{font-size:22px;}
+
+  .mode-label{font-family:'Inter',system-ui,sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+
+  .prompt-area{min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;}
+  .sentence{font-size:19px;font-weight:700;line-height:1.4;color:var(--text);}
+  .hidden-hint{color:var(--muted);font-size:13px;}
+
+  .chunk-pool,.chunk-answer{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:40px;width:100%;}
+  .chunk{background:var(--panel-2);border:1px solid var(--line);padding:8px 12px;border-radius:9px;font-size:14px;cursor:pointer;font-weight:600;color:var(--text);}
+  .chunk:hover{border-color:var(--primary-2);}
+  .chunk-answer .chunk{background:#E7EEFF;border-color:var(--primary);}
+  .divider{width:100%;height:1px;background:var(--line);margin:2px 0;}
+
+  input[type=text]{width:100%;background:#F7F9FD;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px 14px;font-size:15px;font-family:'Inter',system-ui,sans-serif;}
+  input[type=text]:focus{outline:none;border-color:var(--primary);}
+  textarea{width:100%;min-height:100px;background:#F7F9FD;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px 14px;font-size:14px;font-family:'Inter',system-ui,sans-serif;resize:vertical;}
+  textarea:focus{outline:none;border-color:var(--primary);}
+
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+  .opt{background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:12px 8px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;}
+  .opt:hover{border-color:var(--reading);}
+  .opt.correct{border-color:var(--writing);background:#E7F8EF;}
+  .opt.wrong{border-color:var(--bad);background:#FCE9EC;}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;}
+  button.btn{background:var(--primary);color:#fff;border:none;padding:11px 18px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;font-family:'Inter',system-ui,sans-serif;transition:filter .15s;}
+  button.btn:hover{filter:brightness(1.08);}
+  button.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line);font-weight:700;}
+  button.btn.secondary:hover{border-color:var(--primary-2);}
+  button.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .feedback{min-height:24px;font-size:13px;font-weight:700;font-family:'Inter',system-ui,sans-serif;}
+  .feedback.ok{color:var(--writing);}
+  .feedback.bad{color:var(--bad);}
+
+  .dialogue{width:100%;text-align:left;background:#F7F9FD;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.7;color:var(--text);}
+  .dialogue .sp{color:var(--primary);font-weight:700;font-family:'Inter',system-ui,sans-serif;font-size:11px;margin-right:4px;}
+  .dialogue .ln{margin-bottom:2px;}
+
+  .passage-box{width:100%;text-align:left;background:#F7F9FD;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14.5px;line-height:1.7;color:var(--text);}
+
+  .hint{text-align:center;color:var(--muted);font-size:12px;margin-top:14px;line-height:1.6;}
+
+  .summary{text-align:center;}
+  .summary h2{font-size:20px;margin-bottom:4px;color:var(--text);}
+  .summary .big{font-family:'Inter',system-ui,sans-serif;font-size:40px;font-weight:700;color:var(--primary);margin:8px 0;font-variant-numeric:tabular-nums;}
+
+  .lock-screen{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:
+      radial-gradient(1100px 560px at 82% -8%, #E7ECFB 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, #EEF1FB 0%, transparent 55%),
+      var(--bg);}
+  .lock-card{width:100%;max-width:360px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 1px 2px rgba(20,30,60,.04), 0 10px 28px rgba(20,30,60,.08);}
+  .lock-icon{font-size:34px;margin-bottom:6px;}
+  .lock-sub{color:var(--muted);font-size:13px;line-height:1.5;margin:10px 0 18px;}
+  .lock-card input[type=password]{width:100%;background:#F7F9FD;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px 14px;font-size:15px;font-family:'Inter',system-ui,sans-serif;text-align:center;letter-spacing:.05em;}
+  .lock-card input[type=password]:focus{outline:none;border-color:var(--primary);}
+  .lock-error{min-height:20px;color:var(--bad);font-size:13px;font-weight:600;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <div class="eyebrow">V4SE · App 2</div>
+    <h1 style="margin-bottom:4px;">Reflex Training Room</h1>
+    <p class="lock-sub">Enter the access password to start your training session.</p>
+    <input type="password" id="lockInput" placeholder="Password" autocomplete="off">
+    <button class="btn" id="lockSubmit" style="width:100%;margin-top:10px;">Unlock</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+<div class="app" id="appRoot" style="display:none;">
+  <header>
+    <div>
+      <div class="eyebrow">V4SE · App 2</div>
+      <h1>Reflex Training Room</h1>
+    </div>
+    <div class="skills-bar" id="skillsBar"></div>
+    <div class="cefr-estimate" id="cefrEstimate"></div>
+    <div class="sound-check">
+      <button class="btn secondary" id="testSoundBtn">🔊 Test Sound</button>
+      <span class="voice-tag" id="soundCheckMsg">Tap this once to check that audio works on this device/browser.</span>
+      <div class="check-confirm" id="soundConfirm" style="display:none">
+        <button class="btn tiny ok" id="soundOk">✓ Đạt</button>
+        <button class="btn tiny bad" id="soundBad">✗ Chưa đạt</button>
+      </div>
+    </div>
+    <div class="sound-check">
+      <button class="btn secondary" id="testMicBtn">🎙 Test Microphone</button>
+      <span class="voice-tag" id="micCheckMsg">Tap this once to check that your headset mic is picked up correctly.</span>
+      <div class="check-confirm" id="micConfirm" style="display:none">
+        <button class="btn tiny ok" id="micOk">✓ Đạt</button>
+        <button class="btn tiny bad" id="micBad">✗ Chưa đạt</button>
+      </div>
+    </div>
+    <div class="sound-check">
+      <button class="btn secondary" id="micLevelBtn">🎚 Mic Level Test (5s)</button>
+      <div class="mic-level-track" id="micLevelTrack"><div class="mic-level-fill" id="micLevelFill"></div></div>
+      <span class="voice-tag" id="micLevelMsg">Raw signal test — shows if the browser receives ANY audio from your mic, even if speech isn't recognized.</span>
+      <div class="check-confirm" id="levelConfirm" style="display:none">
+        <button class="btn tiny ok" id="levelOk">✓ Đạt</button>
+        <button class="btn tiny bad" id="levelBad">✗ Chưa đạt</button>
+      </div>
+    </div>
+    <div class="voice-tag" id="voiceDebug" style="padding:0 2px;font-size:10px;opacity:.65;"></div>
+    <div class="session-control">
+      <button class="btn session-btn" id="sessionToggleBtn" disabled>▶ Start Session</button>
+      <div class="voice-tag session-hint" id="sessionHint">Hoàn thành ✓ Đạt cho cả 3 bước kiểm tra âm thanh ở trên để bắt đầu.</div>
+    </div>
+  </header>
+
+  <nav class="mode-tabs" id="modeTabs">
+    <button class="tab active" data-mode="repeat">🗣 A. Repeat</button>
+    <button class="tab" data-mode="build">🔤 B. Sentence Build</button>
+    <button class="tab" data-mode="conversations">💬 C. Conversations</button>
+    <button class="tab" data-mode="completion">📖 D. Completion</button>
+    <button class="tab" data-mode="dictation">👂 E. Dictation</button>
+    <button class="tab" data-mode="passage">📝 F. Passage</button>
+  </nav>
+  <div class="hint-row"><button class="tab hint-tab" id="hintTab">💡 Hint / Answer</button></div>
+  <div class="exam-row"><button class="tab exam-tab" id="examTab">🎓 V4SE EXAM — Full Timed Simulation</button></div>
+  <div class="exam-banner" id="examBanner" style="display:none;"></div>
+
+  <main class="stage">
+    <div class="progress-dots" id="progressDots"></div>
+    <div class="card" id="card"></div>
+  </main>
+
+  <div class="hint" id="globalHint">Choose a task type to start a training round — timing and question format match the real V4SE test.</div>
+</div>
+
+<script>
+// ================== DATA: extracted from real Versant 4 Skills Essential test sets ==================
+
+// Part A — Repeat (listen and repeat exactly, 6 seconds)
+const REPEAT_BANK = [
+  {
+    "en": "Could you send me the report by tomorrow afternoon?",
+    "vi": "Bạn có thể gửi báo cáo cho tôi trước chiều mai không?"
+  },
+  {
+    "en": "The new office is closer to the train station.",
+    "vi": "Văn phòng mới gần ga tàu hơn."
+  },
+  {
+    "en": "I forgot to charge my phone last night.",
+    "vi": "Tối qua tôi quên sạc điện thoại."
+  },
+  {
+    "en": "She usually walks to work when the weather is nice.",
+    "vi": "Cô ấy thường đi bộ đến chỗ làm khi thời tiết đẹp."
+  },
+  {
+    "en": "We need to order more paper for the printer.",
+    "vi": "Chúng ta cần đặt thêm giấy cho máy in."
+  },
+  {
+    "en": "The meeting has been moved to next Tuesday.",
+    "vi": "Cuộc họp đã được dời sang thứ Ba tuần sau."
+  },
+  {
+    "en": "He apologized for arriving late to the interview.",
+    "vi": "Anh ấy đã xin lỗi vì đến muộn buổi phỏng vấn."
+  },
+  {
+    "en": "Most customers prefer to pay by credit card.",
+    "vi": "Hầu hết khách hàng thích thanh toán bằng thẻ tín dụng."
+  },
+  {
+    "en": "I haven't decided which restaurant to choose yet.",
+    "vi": "Tôi vẫn chưa quyết định chọn nhà hàng nào."
+  },
+  {
+    "en": "The delivery truck arrives every morning at eight.",
+    "vi": "Xe giao hàng đến vào tám giờ mỗi sáng."
+  },
+  {
+    "en": "Please remember to lock the door when you leave.",
+    "vi": "Hãy nhớ khóa cửa khi bạn ra về."
+  },
+  {
+    "en": "Our team finished the project two days early.",
+    "vi": "Nhóm của chúng tôi hoàn thành dự án sớm hai ngày."
+  },
+  {
+    "en": "It took longer than expected to fix the printer.",
+    "vi": "Việc sửa máy in mất nhiều thời gian hơn dự kiến."
+  },
+  {
+    "en": "The company plans to open a new branch next year.",
+    "vi": "Công ty dự định mở chi nhánh mới vào năm sau."
+  },
+  {
+    "en": "I would like to change my appointment to Friday.",
+    "vi": "Tôi muốn đổi lịch hẹn sang thứ Sáu."
+  },
+  {
+    "en": "The library closes early on public holidays.",
+    "vi": "Thư viện đóng cửa sớm vào các ngày lễ."
+  },
+  {
+    "en": "She was promoted after only six months at the company.",
+    "vi": "Cô ấy được thăng chức chỉ sau sáu tháng làm việc tại công ty."
+  },
+  {
+    "en": "We ran out of coffee in the break room this morning.",
+    "vi": "Sáng nay phòng nghỉ hết cà phê."
+  }
+,
+  {
+    "en": "I need to buy some milk on my way home.",
+    "vi": "Tôi cần mua ít sữa trên đường về nhà."
+  },
+  {
+    "en": "Can you turn down the air conditioner a little?",
+    "vi": "Bạn có thể vặn nhỏ máy lạnh một chút không?"
+  },
+  {
+    "en": "My sister is coming to visit us this weekend.",
+    "vi": "Chị tôi sẽ đến thăm chúng tôi vào cuối tuần này."
+  },
+  {
+    "en": "The bus was late again this morning.",
+    "vi": "Xe buýt lại đến trễ vào sáng nay."
+  },
+  {
+    "en": "I left my laptop charger at my friend's house last weekend.",
+    "vi": "Cuối tuần trước tôi để quên sạc laptop ở nhà bạn."
+  },
+  {
+    "en": "The company canteen serves a different menu every day.",
+    "vi": "Căn tin công ty phục vụ thực đơn khác nhau mỗi ngày."
+  },
+  {
+    "en": "The doctor said I should drink more water every day.",
+    "vi": "Bác sĩ nói tôi nên uống nhiều nước hơn mỗi ngày."
+  },
+  {
+    "en": "We are planning a short trip to the beach next month.",
+    "vi": "Chúng tôi đang lên kế hoạch cho một chuyến đi ngắn ra biển vào tháng sau."
+  },
+  {
+    "en": "My father is repairing the fence in the backyard.",
+    "vi": "Bố tôi đang sửa hàng rào ở sân sau."
+  },
+  {
+    "en": "It's supposed to rain heavily this afternoon.",
+    "vi": "Trời được dự báo sẽ mưa to vào chiều nay."
+  },
+  {
+    "en": "I usually cook dinner for my family on Sundays.",
+    "vi": "Tôi thường nấu bữa tối cho gia đình vào Chủ Nhật."
+  },
+  {
+    "en": "The supermarket near my house is open until midnight.",
+    "vi": "Siêu thị gần nhà tôi mở cửa đến nửa đêm."
+  },
+  {
+    "en": "She just moved into a new apartment downtown.",
+    "vi": "Cô ấy vừa chuyển vào một căn hộ mới ở trung tâm thành phố."
+  },
+  {
+    "en": "Could you help me carry these grocery bags upstairs?",
+    "vi": "Bạn có thể giúp tôi mang mấy túi đồ tạp hóa lên lầu không?"
+  },
+  {
+    "en": "My grandmother enjoys gardening early in the morning.",
+    "vi": "Bà tôi thích làm vườn vào sáng sớm."
+  },
+  {
+    "en": "The traffic was really bad on the highway today.",
+    "vi": "Giao thông trên đường cao tốc hôm nay thực sự tệ."
+  },
+  {
+    "en": "My sister called to tell us she got a new job offer.",
+    "vi": "Chị tôi gọi điện báo rằng chị ấy nhận được lời mời công việc mới."
+  },
+  {
+    "en": "We ran out of coffee, so I'll buy some tonight.",
+    "vi": "Chúng tôi hết cà phê rồi, nên tối nay tôi sẽ mua thêm."
+  },
+  {
+    "en": "The children were excited about their first day of school.",
+    "vi": "Bọn trẻ rất hào hứng với ngày đầu tiên đến trường."
+  },
+  {
+    "en": "My neighbor is painting his house this weekend.",
+    "vi": "Hàng xóm của tôi đang sơn lại nhà vào cuối tuần này."
+  },
+  {
+    "en": "Please email me the updated schedule by Friday.",
+    "vi": "Vui lòng gửi email cho tôi lịch trình cập nhật trước thứ Sáu."
+  },
+  {
+    "en": "The client asked for a discount on the last order.",
+    "vi": "Khách hàng yêu cầu giảm giá cho đơn hàng gần nhất."
+  },
+  {
+    "en": "Our team will present the new project on Monday.",
+    "vi": "Nhóm chúng tôi sẽ trình bày dự án mới vào thứ Hai."
+  },
+  {
+    "en": "I have to finish this proposal before the deadline.",
+    "vi": "Tôi phải hoàn thành đề xuất này trước hạn chót."
+  },
+  {
+    "en": "The scanner on the second floor stopped working yesterday.",
+    "vi": "Máy quét ở tầng hai ngừng hoạt động từ hôm qua."
+  },
+  {
+    "en": "Let's schedule a quick call to discuss the budget.",
+    "vi": "Hãy sắp xếp một cuộc gọi ngắn để bàn về ngân sách."
+  },
+  {
+    "en": "My manager asked me to update the sales report.",
+    "vi": "Quản lý của tôi yêu cầu tôi cập nhật báo cáo doanh số."
+  },
+  {
+    "en": "The Wi-Fi in the meeting room isn't working properly.",
+    "vi": "Wi-Fi trong phòng họp hoạt động không ổn định."
+  },
+  {
+    "en": "We need to book a conference room for the interview.",
+    "vi": "Chúng ta cần đặt phòng họp cho buổi phỏng vấn."
+  },
+  {
+    "en": "I forwarded your message to the accounting department.",
+    "vi": "Tôi đã chuyển tin nhắn của bạn đến phòng kế toán."
+  },
+  {
+    "en": "The new intern starts working with us next week.",
+    "vi": "Thực tập sinh mới sẽ bắt đầu làm việc với chúng tôi vào tuần sau."
+  },
+  {
+    "en": "Could you proofread this email before I send it?",
+    "vi": "Bạn có thể đọc lại email này trước khi tôi gửi không?"
+  },
+  {
+    "en": "Our flight to Da Nang was delayed by two hours.",
+    "vi": "Chuyến bay của chúng tôi đến Đà Nẵng bị trễ hai tiếng."
+  },
+  {
+    "en": "I booked a hotel room near the airport for our trip.",
+    "vi": "Tôi đã đặt phòng khách sạn gần sân bay cho chuyến đi."
+  },
+  {
+    "en": "She caught a cold after walking in the rain.",
+    "vi": "Cô ấy bị cảm sau khi đi dưới mưa."
+  },
+  {
+    "en": "The pharmacy closes early on Sundays.",
+    "vi": "Nhà thuốc đóng cửa sớm vào Chủ Nhật."
+  },
+  {
+    "en": "We should replace the light bulb in the hallway.",
+    "vi": "Chúng ta nên thay bóng đèn ở hành lang."
+  },
+  {
+    "en": "My phone battery dies really fast these days.",
+    "vi": "Pin điện thoại của tôi dạo này hết rất nhanh."
+  },
+  {
+    "en": "The landlord is coming to fix the leaking pipe tomorrow.",
+    "vi": "Chủ nhà sẽ đến sửa đường ống bị rò rỉ vào ngày mai."
+  },
+  {
+    "en": "I'm trying to save some money for a new laptop.",
+    "vi": "Tôi đang cố gắng để dành tiền mua một chiếc laptop mới."
+  },
+  {
+    "en": "The forecast says it might rain during the weekend trip.",
+    "vi": "Dự báo nói rằng có thể sẽ mưa trong chuyến đi cuối tuần."
+  },
+  {
+    "en": "My cousin is getting married next spring.",
+    "vi": "Anh họ tôi sẽ kết hôn vào mùa xuân năm sau."
+  },
+  {
+    "en": "We usually go grocery shopping on Saturday mornings.",
+    "vi": "Chúng tôi thường đi mua đồ tạp hóa vào sáng thứ Bảy."
+  },
+  {
+    "en": "The elevator in our building is out of order today.",
+    "vi": "Thang máy trong tòa nhà chúng tôi bị hỏng hôm nay."
+  },
+  {
+    "en": "I need to pick up my kids from school at four.",
+    "vi": "Tôi cần đón con ở trường lúc bốn giờ."
+  },
+  {
+    "en": "Could you send the invoice to the client this afternoon?",
+    "vi": "Bạn có thể gửi hóa đơn cho khách hàng vào chiều nay không?"
+  },
+  {
+    "en": "Our department is moving to a bigger office next month.",
+    "vi": "Phòng ban chúng tôi sẽ chuyển đến văn phòng lớn hơn vào tháng sau."
+  },
+  {
+    "en": "The vending machine on our floor only accepts cash now.",
+    "vi": "Máy bán hàng tự động ở tầng chúng tôi giờ chỉ nhận tiền mặt."
+  },
+  {
+    "en": "I have a dentist appointment tomorrow morning.",
+    "vi": "Tôi có hẹn khám nha sĩ vào sáng mai."
+  },
+  {
+    "en": "Let's finish the presentation before the client arrives.",
+    "vi": "Hãy hoàn thành bài thuyết trình trước khi khách hàng đến."
+  }
+];
+
+// Part B — Sentence Builds (listen to shuffled word groups, arrange and say, 8 seconds)
+const BUILD_BANK = [
+  {
+    "chunks": [
+      "Could you send me",
+      "the report",
+      "by tomorrow?"
+    ],
+    "answer": "Could you send me the report by tomorrow?",
+    "vi": "Bạn có thể gửi báo cáo cho tôi trước ngày mai không?"
+  },
+  {
+    "chunks": [
+      "The meeting",
+      "has been moved",
+      "to next Tuesday."
+    ],
+    "answer": "The meeting has been moved to next Tuesday.",
+    "vi": "Cuộc họp đã được dời sang thứ Ba tuần sau."
+  },
+  {
+    "chunks": [
+      "I need to finish",
+      "this report",
+      "before lunch."
+    ],
+    "answer": "I need to finish this report before lunch.",
+    "vi": "Tôi cần hoàn thành báo cáo này trước giờ ăn trưa."
+  },
+  {
+    "chunks": [
+      "She forgot to bring",
+      "her umbrella",
+      "today."
+    ],
+    "answer": "She forgot to bring her umbrella today.",
+    "vi": "Cô ấy quên mang theo ô hôm nay."
+  },
+  {
+    "chunks": [
+      "Our flight was delayed",
+      "because of",
+      "the storm."
+    ],
+    "answer": "Our flight was delayed because of the storm.",
+    "vi": "Chuyến bay của chúng tôi bị hoãn vì cơn bão."
+  },
+  {
+    "chunks": [
+      "Can you turn down",
+      "the volume",
+      "a little?"
+    ],
+    "answer": "Can you turn down the volume a little?",
+    "vi": "Bạn có thể vặn nhỏ âm lượng một chút không?"
+  },
+  {
+    "chunks": [
+      "The new employee",
+      "starts work",
+      "on Monday."
+    ],
+    "answer": "The new employee starts work on Monday.",
+    "vi": "Nhân viên mới sẽ bắt đầu làm việc vào thứ Hai."
+  },
+  {
+    "chunks": [
+      "We should book the tickets",
+      "before they",
+      "sell out."
+    ],
+    "answer": "We should book the tickets before they sell out.",
+    "vi": "Chúng ta nên đặt vé trước khi chúng bán hết."
+  },
+  {
+    "chunks": [
+      "He left his keys",
+      "on the kitchen",
+      "table."
+    ],
+    "answer": "He left his keys on the kitchen table.",
+    "vi": "Anh ấy để chìa khóa trên bàn bếp."
+  },
+  {
+    "chunks": [
+      "I'll call you back",
+      "in five",
+      "minutes."
+    ],
+    "answer": "I'll call you back in five minutes.",
+    "vi": "Tôi sẽ gọi lại cho bạn sau năm phút."
+  }
+,
+  {
+    "chunks": [
+        "Please confirm",
+        "your attendance",
+        "by Friday."
+    ],
+    "answer": "Please confirm your attendance by Friday.",
+    "vi": "Vui lòng xác nhận tham dự trước thứ Sáu."
+  },
+  {
+    "chunks": [
+        "I need to review",
+        "this contract",
+        "before lunch."
+    ],
+    "answer": "I need to review this contract before lunch.",
+    "vi": "Tôi cần xem lại hợp đồng này trước giờ ăn trưa."
+  },
+  {
+    "chunks": [
+        "She forgot to bring",
+        "her laptop charger",
+        "to the meeting."
+    ],
+    "answer": "She forgot to bring her laptop charger to the meeting.",
+    "vi": "Cô ấy quên mang sạc laptop đến cuộc họp."
+  },
+  {
+    "chunks": [
+        "We are planning",
+        "a trip",
+        "to the mountains."
+    ],
+    "answer": "We are planning a trip to the mountains.",
+    "vi": "Chúng tôi đang lên kế hoạch cho chuyến đi lên núi."
+  },
+  {
+    "chunks": [
+        "The manager asked us",
+        "to update",
+        "the report."
+    ],
+    "answer": "The manager asked us to update the report.",
+    "vi": "Quản lý yêu cầu chúng tôi cập nhật báo cáo."
+  },
+  {
+    "chunks": [
+        "My father is fixing",
+        "the car",
+        "in the garage."
+    ],
+    "answer": "My father is fixing the car in the garage.",
+    "vi": "Bố tôi đang sửa xe trong ga-ra."
+  },
+  {
+    "chunks": [
+        "Could you turn off",
+        "the lights",
+        "before leaving?"
+    ],
+    "answer": "Could you turn off the lights before leaving?",
+    "vi": "Bạn có thể tắt đèn trước khi rời đi không?"
+  },
+  {
+    "chunks": [
+        "The train to the city",
+        "was delayed",
+        "this morning."
+    ],
+    "answer": "The train to the city was delayed this morning.",
+    "vi": "Chuyến tàu vào thành phố bị trễ sáng nay."
+  },
+  {
+    "chunks": [
+        "I have to pick up",
+        "my daughter",
+        "from school."
+    ],
+    "answer": "I have to pick up my daughter from school.",
+    "vi": "Tôi phải đón con gái ở trường."
+  },
+  {
+    "chunks": [
+        "Please email",
+        "the client",
+        "about the new price."
+    ],
+    "answer": "Please email the client about the new price.",
+    "vi": "Vui lòng gửi email cho khách hàng về giá mới."
+  },
+  {
+    "chunks": [
+        "We should book",
+        "the meeting room",
+        "for Friday."
+    ],
+    "answer": "We should book the meeting room for Friday.",
+    "vi": "Chúng ta nên đặt phòng họp cho thứ Sáu."
+  },
+  {
+    "chunks": [
+        "The doctor told her",
+        "to rest",
+        "for a few days."
+    ],
+    "answer": "The doctor told her to rest for a few days.",
+    "vi": "Bác sĩ bảo cô ấy nghỉ ngơi vài ngày."
+  },
+  {
+    "chunks": [
+        "I forgot my badge",
+        "at home",
+        "this morning."
+    ],
+    "answer": "I forgot my badge at home this morning.",
+    "vi": "Sáng nay tôi quên thẻ nhân viên ở nhà."
+  },
+  {
+    "chunks": [
+        "They moved into",
+        "a new house",
+        "last week."
+    ],
+    "answer": "They moved into a new house last week.",
+    "vi": "Tuần trước họ chuyển vào một ngôi nhà mới."
+  },
+  {
+    "chunks": [
+        "Our flight leaves",
+        "at seven",
+        "tomorrow morning."
+    ],
+    "answer": "Our flight leaves at seven tomorrow morning.",
+    "vi": "Chuyến bay của chúng tôi khởi hành lúc bảy giờ sáng mai."
+  },
+  {
+    "chunks": [
+        "I need to renew",
+        "my contract",
+        "before June."
+    ],
+    "answer": "I need to renew my contract before June.",
+    "vi": "Tôi cần gia hạn hợp đồng trước tháng Sáu."
+  },
+  {
+    "chunks": [
+        "She usually walks",
+        "her dog",
+        "in the evening."
+    ],
+    "answer": "She usually walks her dog in the evening.",
+    "vi": "Cô ấy thường dắt chó đi dạo vào buổi tối."
+  },
+  {
+    "chunks": [
+        "The printer stopped",
+        "working",
+        "an hour ago."
+    ],
+    "answer": "The printer stopped working an hour ago.",
+    "vi": "Máy in ngừng hoạt động cách đây một giờ."
+  },
+  {
+    "chunks": [
+        "We need to save",
+        "money",
+        "for the wedding."
+    ],
+    "answer": "We need to save money for the wedding.",
+    "vi": "Chúng tôi cần tiết kiệm tiền cho đám cưới."
+  },
+  {
+    "chunks": [
+        "Could you check",
+        "the numbers",
+        "again, please?"
+    ],
+    "answer": "Could you check the numbers again, please?",
+    "vi": "Bạn có thể kiểm tra lại các con số được không?"
+  },
+  {
+    "chunks": [
+        "The kids were playing",
+        "outside",
+        "until dark."
+    ],
+    "answer": "The kids were playing outside until dark.",
+    "vi": "Bọn trẻ chơi ngoài trời cho đến khi trời tối."
+  },
+  {
+    "chunks": [
+        "I have a doctor's",
+        "appointment",
+        "this afternoon."
+    ],
+    "answer": "I have a doctor's appointment this afternoon.",
+    "vi": "Chiều nay tôi có hẹn khám bác sĩ."
+  },
+  {
+    "chunks": [
+        "The landlord will fix",
+        "the pipe",
+        "tomorrow."
+    ],
+    "answer": "The landlord will fix the pipe tomorrow.",
+    "vi": "Chủ nhà sẽ sửa đường ống vào ngày mai."
+  },
+  {
+    "chunks": [
+        "We should call",
+        "the customer",
+        "back today."
+    ],
+    "answer": "We should call the customer back today.",
+    "vi": "Chúng ta nên gọi lại cho khách hàng hôm nay."
+  },
+  {
+    "chunks": [
+        "My brother is studying",
+        "English",
+        "at night."
+    ],
+    "answer": "My brother is studying English at night.",
+    "vi": "Em trai tôi học tiếng Anh vào buổi tối."
+  },
+  {
+    "chunks": [
+        "The gym is closed",
+        "for renovation",
+        "this month."
+    ],
+    "answer": "The gym is closed for renovation this month.",
+    "vi": "Phòng gym đóng cửa để cải tạo trong tháng này."
+  },
+  {
+    "chunks": [
+        "I left my laptop",
+        "charger",
+        "at the office."
+    ],
+    "answer": "I left my laptop charger at the office.",
+    "vi": "Tôi để quên sạc laptop ở văn phòng."
+  },
+  {
+    "chunks": [
+        "She is preparing",
+        "dinner",
+        "for her family now."
+    ],
+    "answer": "She is preparing dinner for her family now.",
+    "vi": "Cô ấy đang chuẩn bị bữa tối cho gia đình."
+  },
+  {
+    "chunks": [
+        "The department is looking",
+        "for a new",
+        "assistant."
+    ],
+    "answer": "The department is looking for a new assistant.",
+    "vi": "Phòng ban đang tìm một trợ lý mới."
+  },
+  {
+    "chunks": [
+        "We ran out of",
+        "business cards",
+        "before the event."
+    ],
+    "answer": "We ran out of business cards before the event.",
+    "vi": "Chúng tôi hết danh thiếp trước khi sự kiện diễn ra."
+  },
+  {
+    "chunks": [
+        "I need to submit",
+        "this form",
+        "by Friday."
+    ],
+    "answer": "I need to submit this form by Friday.",
+    "vi": "Tôi cần nộp mẫu đơn này trước thứ Sáu."
+  },
+  {
+    "chunks": [
+        "The weather turned cold",
+        "very",
+        "suddenly today."
+    ],
+    "answer": "The weather turned cold very suddenly today.",
+    "vi": "Thời tiết đột nhiên trở lạnh hôm nay."
+  },
+  {
+    "chunks": [
+        "My mother is visiting",
+        "us",
+        "this weekend."
+    ],
+    "answer": "My mother is visiting us this weekend.",
+    "vi": "Mẹ tôi sẽ đến thăm chúng tôi cuối tuần này."
+  },
+  {
+    "chunks": [
+        "The elevator is broken",
+        "again",
+        "this week."
+    ],
+    "answer": "The elevator is broken again this week.",
+    "vi": "Thang máy lại bị hỏng trong tuần này."
+  },
+  {
+    "chunks": [
+        "I have to finish",
+        "the budget report",
+        "tonight."
+    ],
+    "answer": "I have to finish the budget report tonight.",
+    "vi": "Tối nay tôi phải hoàn thành báo cáo ngân sách."
+  },
+  {
+    "chunks": [
+        "Our team missed",
+        "the deadline",
+        "last month."
+    ],
+    "answer": "Our team missed the deadline last month.",
+    "vi": "Nhóm chúng tôi đã lỡ hạn chót vào tháng trước."
+  },
+  {
+    "chunks": [
+        "The waiter forgot",
+        "to bring",
+        "our drinks."
+    ],
+    "answer": "The waiter forgot to bring our drinks.",
+    "vi": "Người phục vụ quên mang nước uống cho chúng tôi."
+  },
+  {
+    "chunks": [
+        "I want to buy",
+        "a new phone",
+        "next month."
+    ],
+    "answer": "I want to buy a new phone next month.",
+    "vi": "Tôi muốn mua điện thoại mới vào tháng sau."
+  },
+  {
+    "chunks": [
+        "The bus stop is",
+        "right next",
+        "to the bank."
+    ],
+    "answer": "The bus stop is right next to the bank.",
+    "vi": "Trạm xe buýt ngay cạnh ngân hàng."
+  },
+  {
+    "chunks": [
+        "She needs to finish",
+        "her homework",
+        "before dinner."
+    ],
+    "answer": "She needs to finish her homework before dinner.",
+    "vi": "Cô bé cần làm xong bài tập trước bữa tối."
+  },
+  {
+    "chunks": [
+        "The client wants",
+        "a meeting",
+        "next Wednesday."
+    ],
+    "answer": "The client wants a meeting next Wednesday.",
+    "vi": "Khách hàng muốn có một cuộc họp vào thứ Tư tới."
+  },
+  {
+    "chunks": [
+        "We need to clean",
+        "the house",
+        "before guests arrive."
+    ],
+    "answer": "We need to clean the house before guests arrive.",
+    "vi": "Chúng tôi cần dọn nhà trước khi khách đến."
+  },
+  {
+    "chunks": [
+        "I forgot to save",
+        "the document",
+        "before closing it."
+    ],
+    "answer": "I forgot to save the document before closing it.",
+    "vi": "Tôi quên lưu tài liệu trước khi đóng nó."
+  },
+  {
+    "chunks": [
+        "The new policy",
+        "will start",
+        "next Monday."
+    ],
+    "answer": "The new policy will start next Monday.",
+    "vi": "Chính sách mới sẽ bắt đầu vào thứ Hai tới."
+  },
+  {
+    "chunks": [
+        "My colleague is",
+        "out sick",
+        "this week."
+    ],
+    "answer": "My colleague is out sick this week.",
+    "vi": "Đồng nghiệp của tôi bị ốm trong tuần này."
+  },
+  {
+    "chunks": [
+        "We should order",
+        "more supplies",
+        "for the office."
+    ],
+    "answer": "We should order more supplies for the office.",
+    "vi": "Chúng ta nên đặt thêm vật dụng cho văn phòng."
+  },
+  {
+    "chunks": [
+        "I need directions",
+        "to the nearest",
+        "pharmacy."
+    ],
+    "answer": "I need directions to the nearest pharmacy.",
+    "vi": "Tôi cần chỉ đường đến nhà thuốc gần nhất."
+  },
+  {
+    "chunks": [
+        "The kids get home",
+        "from school",
+        "around three."
+    ],
+    "answer": "The kids get home from school around three.",
+    "vi": "Bọn trẻ về nhà từ trường vào khoảng ba giờ."
+  },
+  {
+    "chunks": [
+        "I have to reschedule",
+        "my appointment",
+        "for Thursday."
+    ],
+    "answer": "I have to reschedule my appointment for Thursday.",
+    "vi": "Tôi phải dời lịch hẹn sang thứ Năm."
+  },
+  {
+    "chunks": [
+        "The company will announce",
+        "the results",
+        "tomorrow."
+    ],
+    "answer": "The company will announce the results tomorrow.",
+    "vi": "Công ty sẽ công bố kết quả vào ngày mai."
+  }
+];
+
+// Part C — Conversations (listen to a short dialogue, answer a follow-up question briefly)
+const CONV_BANK = [
+  {
+    "lines": [
+      "Speaker 1: Did you finish the report yet?",
+      "Speaker 2: Almost, I just need to check the numbers.",
+      "Speaker 1: Okay, let me know when it's ready."
+    ],
+    "question": "What does the woman still need to do?",
+    "answers": [
+      "check the numbers",
+      "check the numbers on the report"
+    ],
+    "vi": "Người phụ nữ còn cần làm gì? → Kiểm tra lại các con số"
+  },
+  {
+    "lines": [
+      "Speaker 1: I can't find my badge.",
+      "Speaker 2: Did you check your bag?",
+      "Speaker 1: Oh, here it is. Thanks!"
+    ],
+    "question": "What was the man looking for?",
+    "answers": [
+      "his badge",
+      "a badge"
+    ],
+    "vi": "Người đàn ông đang tìm gì? → Thẻ nhân viên của anh ấy"
+  },
+  {
+    "lines": [
+      "Speaker 1: The printer is out of paper again.",
+      "Speaker 2: There's more in the cabinet.",
+      "Speaker 1: Thanks, I'll get some."
+    ],
+    "question": "What is out of paper?",
+    "answers": [
+      "the printer"
+    ],
+    "vi": "Cái gì đang hết giấy? → Máy in"
+  },
+  {
+    "lines": [
+      "Speaker 1: Are you coming to the party tonight?",
+      "Speaker 2: I'd love to, but I have to work late.",
+      "Speaker 1: That's too bad."
+    ],
+    "question": "Why can't the woman come to the party?",
+    "answers": [
+      "she has to work late",
+      "because she has to work late"
+    ],
+    "vi": "Vì sao người phụ nữ không thể đến bữa tiệc? → Vì cô ấy phải làm việc muộn"
+  },
+  {
+    "lines": [
+      "Speaker 1: How was your trip to Da Nang?",
+      "Speaker 2: It was great, the beaches were beautiful.",
+      "Speaker 1: I'd love to go there someday."
+    ],
+    "question": "What did the woman like about her trip?",
+    "answers": [
+      "the beaches",
+      "the beaches were beautiful"
+    ],
+    "vi": "Người phụ nữ thích điều gì trong chuyến đi? → Những bãi biển đẹp"
+  },
+  {
+    "lines": [
+      "Speaker 1: Can you send me the invoice again?",
+      "Speaker 2: Sure, I'll email it right now.",
+      "Speaker 1: Thank you so much."
+    ],
+    "question": "What will the man send?",
+    "answers": [
+      "the invoice"
+    ],
+    "vi": "Người đàn ông sẽ gửi gì? → Hóa đơn"
+  },
+  {
+    "lines": [
+      "Speaker 1: This coffee shop is always crowded.",
+      "Speaker 2: Yes, especially in the morning.",
+      "Speaker 1: Let's come back later then."
+    ],
+    "question": "When is the coffee shop especially crowded?",
+    "answers": [
+      "in the morning",
+      "the morning"
+    ],
+    "vi": "Quán cà phê đông nhất khi nào? → Vào buổi sáng"
+  },
+  {
+    "lines": [
+      "Speaker 1: I think I left my umbrella at the office.",
+      "Speaker 2: Don't worry, you can borrow mine.",
+      "Speaker 1: Thanks, that's very kind."
+    ],
+    "question": "What did the woman offer to lend?",
+    "answers": [
+      "her umbrella",
+      "an umbrella"
+    ],
+    "vi": "Người phụ nữ đề nghị cho mượn gì? → Chiếc ô của cô ấy"
+  },
+  {
+    "lines": [
+      "Speaker 1: The elevator is broken again.",
+      "Speaker 2: We'll have to take the stairs.",
+      "Speaker 1: That's fine, it's only two floors."
+    ],
+    "question": "What is broken?",
+    "answers": [
+      "the elevator"
+    ],
+    "vi": "Cái gì bị hỏng? → Thang máy"
+  },
+  {
+    "lines": [
+      "Speaker 1: Did you hear back from the client?",
+      "Speaker 2: Not yet, I'll call them this afternoon.",
+      "Speaker 1: Okay, let me know what they say."
+    ],
+    "question": "When will the man call the client?",
+    "answers": [
+      "this afternoon",
+      "in the afternoon"
+    ],
+    "vi": "Khi nào người đàn ông sẽ gọi cho khách hàng? → Vào chiều nay"
+  }
+,
+  {
+    "lines": [
+        "Speaker 1: Have you finished the report?",
+        "Speaker 2: Not yet, I need another hour.",
+        "Speaker 1: Okay, let me know when it's done."
+    ],
+    "question": "How much more time does the man need?",
+    "answers": [
+        "another hour",
+        "one more hour"
+    ],
+    "vi": "Người đàn ông cần thêm bao lâu? → Thêm một giờ nữa"
+  },
+  {
+    "lines": [
+        "Speaker 1: Where did you put the keys?",
+        "Speaker 2: They're on the kitchen table.",
+        "Speaker 1: Thanks, I found them."
+    ],
+    "question": "Where were the keys?",
+    "answers": [
+        "on the kitchen table",
+        "on the table"
+    ],
+    "vi": "Chìa khóa ở đâu? → Trên bàn bếp"
+  },
+  {
+    "lines": [
+        "Speaker 1: Is the meeting still at three?",
+        "Speaker 2: No, it was moved to four.",
+        "Speaker 1: Thanks for telling me."
+    ],
+    "question": "What time is the meeting now?",
+    "answers": [
+        "at four",
+        "four o'clock"
+    ],
+    "vi": "Cuộc họp diễn ra lúc mấy giờ bây giờ? → Bốn giờ"
+  },
+  {
+    "lines": [
+        "Speaker 1: Can you pick me up after work?",
+        "Speaker 2: Sure, what time do you finish?",
+        "Speaker 1: Around six."
+    ],
+    "question": "What time does the woman finish work?",
+    "answers": [
+        "around six",
+        "six o'clock"
+    ],
+    "vi": "Người phụ nữ tan làm lúc mấy giờ? → Khoảng sáu giờ"
+  },
+  {
+    "lines": [
+        "Speaker 1: Did you send the invoice yet?",
+        "Speaker 2: Yes, I sent it this morning.",
+        "Speaker 1: Great, thank you."
+    ],
+    "question": "When did the man send the invoice?",
+    "answers": [
+        "this morning"
+    ],
+    "vi": "Người đàn ông gửi hóa đơn khi nào? → Sáng nay"
+  },
+  {
+    "lines": [
+        "Speaker 1: The printer isn't working again.",
+        "Speaker 2: I'll call IT support now.",
+        "Speaker 1: Thanks, I really need it."
+    ],
+    "question": "What will the woman do?",
+    "answers": [
+        "call IT support",
+        "call IT"
+    ],
+    "vi": "Người phụ nữ sẽ làm gì? → Gọi bộ phận IT"
+  },
+  {
+    "lines": [
+        "Speaker 1: I can't find my glasses.",
+        "Speaker 2: Check your bag, maybe.",
+        "Speaker 1: You're right, they're here."
+    ],
+    "question": "Where were the glasses found?",
+    "answers": [
+        "in his bag",
+        "in the bag"
+    ],
+    "vi": "Kính được tìm thấy ở đâu? → Trong túi của anh ấy"
+  },
+  {
+    "lines": [
+        "Speaker 1: How was your trip to Da Lat?",
+        "Speaker 2: It was great, but a bit cold.",
+        "Speaker 1: That sounds nice anyway."
+    ],
+    "question": "How was the weather in Da Lat?",
+    "answers": [
+        "a bit cold",
+        "cold"
+    ],
+    "vi": "Thời tiết ở Đà Lạt thế nào? → Hơi lạnh"
+  },
+  {
+    "lines": [
+        "Speaker 1: Have you called the client back?",
+        "Speaker 2: Not yet, I'll do it after lunch.",
+        "Speaker 1: Okay, don't forget."
+    ],
+    "question": "When will the woman call the client?",
+    "answers": [
+        "after lunch"
+    ],
+    "vi": "Người phụ nữ sẽ gọi cho khách hàng khi nào? → Sau bữa trưa"
+  },
+  {
+    "lines": [
+        "Speaker 1: The kids are hungry.",
+        "Speaker 2: I'll order some pizza.",
+        "Speaker 1: Sounds good to me."
+    ],
+    "question": "What will the man order?",
+    "answers": [
+        "pizza"
+    ],
+    "vi": "Người đàn ông sẽ đặt món gì? → Pizza"
+  },
+  {
+    "lines": [
+        "Speaker 1: Did you fix the leaking pipe?",
+        "Speaker 2: Yes, the plumber came this morning.",
+        "Speaker 1: That's a relief."
+    ],
+    "question": "Who fixed the pipe?",
+    "answers": [
+        "the plumber"
+    ],
+    "vi": "Ai đã sửa đường ống? → Thợ sửa ống nước"
+  },
+  {
+    "lines": [
+        "Speaker 1: I'm thinking about buying a new car.",
+        "Speaker 2: What kind are you looking at?",
+        "Speaker 1: Maybe a small electric one."
+    ],
+    "question": "What kind of car is the man considering?",
+    "answers": [
+        "a small electric one",
+        "an electric car"
+    ],
+    "vi": "Người đàn ông đang cân nhắc loại xe nào? → Một chiếc xe điện nhỏ"
+  },
+  {
+    "lines": [
+        "Speaker 1: We're out of milk again.",
+        "Speaker 2: I'll grab some on my way home.",
+        "Speaker 1: Thanks, I appreciate it."
+    ],
+    "question": "What will the man buy on his way home?",
+    "answers": [
+        "milk"
+    ],
+    "vi": "Người đàn ông sẽ mua gì trên đường về nhà? → Sữa"
+  },
+  {
+    "lines": [
+        "Speaker 1: Can you send me the file today?",
+        "Speaker 2: I'm still working on it.",
+        "Speaker 1: Okay, tomorrow is fine too."
+    ],
+    "question": "Is the file ready today?",
+    "answers": [
+        "no",
+        "not yet"
+    ],
+    "vi": "File có sẵn sàng hôm nay không? → Chưa"
+  },
+  {
+    "lines": [
+        "Speaker 1: My back hurts from sitting all day.",
+        "Speaker 2: You should take short breaks.",
+        "Speaker 1: Good idea, I will."
+    ],
+    "question": "What does the woman suggest?",
+    "answers": [
+        "taking short breaks",
+        "take short breaks"
+    ],
+    "vi": "Người phụ nữ đề nghị điều gì? → Nghỉ giải lao ngắn"
+  },
+  {
+    "lines": [
+        "Speaker 1: The flight got delayed by an hour.",
+        "Speaker 2: That's annoying. What time now?",
+        "Speaker 1: It leaves at nine instead."
+    ],
+    "question": "What time does the flight leave now?",
+    "answers": [
+        "at nine",
+        "nine o'clock"
+    ],
+    "vi": "Chuyến bay khởi hành lúc mấy giờ bây giờ? → Chín giờ"
+  },
+  {
+    "lines": [
+        "Speaker 1: Have you seen my notebook?",
+        "Speaker 2: I think it's on your desk.",
+        "Speaker 1: Oh right, thanks."
+    ],
+    "question": "Where was the notebook?",
+    "answers": [
+        "on the desk"
+    ],
+    "vi": "Cuốn sổ ở đâu? → Trên bàn"
+  },
+  {
+    "lines": [
+        "Speaker 1: The new intern seems nice.",
+        "Speaker 2: Yes, she learns very quickly.",
+        "Speaker 1: That's good to hear."
+    ],
+    "question": "What did the man say about the intern?",
+    "answers": [
+        "she learns quickly",
+        "learns quickly"
+    ],
+    "vi": "Người đàn ông nói gì về thực tập sinh mới? → Cô ấy học rất nhanh"
+  },
+  {
+    "lines": [
+        "Speaker 1: I think I'm getting a cold.",
+        "Speaker 2: You should rest and drink water.",
+        "Speaker 1: I will, thanks."
+    ],
+    "question": "What does the woman advise?",
+    "answers": [
+        "rest and drink water"
+    ],
+    "vi": "Người phụ nữ khuyên gì? → Nghỉ ngơi và uống nước"
+  },
+  {
+    "lines": [
+        "Speaker 1: When does the store open?",
+        "Speaker 2: At nine in the morning.",
+        "Speaker 1: Great, let's go then."
+    ],
+    "question": "What time does the store open?",
+    "answers": [
+        "at nine",
+        "nine in the morning"
+    ],
+    "vi": "Cửa hàng mở cửa lúc mấy giờ? → Chín giờ sáng"
+  },
+  {
+    "lines": [
+        "Speaker 1: We need more chairs for the meeting.",
+        "Speaker 2: I'll bring some from the next room.",
+        "Speaker 1: Thanks, that helps."
+    ],
+    "question": "What will the man bring?",
+    "answers": [
+        "more chairs",
+        "chairs"
+    ],
+    "vi": "Người đàn ông sẽ mang gì tới? → Thêm ghế"
+  },
+  {
+    "lines": [
+        "Speaker 1: Did you find a place to live yet?",
+        "Speaker 2: Yes, I signed the lease yesterday.",
+        "Speaker 1: Congratulations!"
+    ],
+    "question": "When did the woman sign the lease?",
+    "answers": [
+        "yesterday"
+    ],
+    "vi": "Người phụ nữ ký hợp đồng thuê nhà khi nào? → Hôm qua"
+  },
+  {
+    "lines": [
+        "Speaker 1: The internet connection keeps dropping.",
+        "Speaker 2: Try restarting the router.",
+        "Speaker 1: Okay, let me try that."
+    ],
+    "question": "What does the man suggest?",
+    "answers": [
+        "restarting the router",
+        "restart the router"
+    ],
+    "vi": "Người đàn ông đề nghị gì? → Khởi động lại router"
+  },
+  {
+    "lines": [
+        "Speaker 1: I'm going to the market later.",
+        "Speaker 2: Can you get some vegetables for me?",
+        "Speaker 1: Sure, no problem."
+    ],
+    "question": "What does the woman ask for?",
+    "answers": [
+        "vegetables"
+    ],
+    "vi": "Người phụ nữ nhờ mua gì? → Rau"
+  },
+  {
+    "lines": [
+        "Speaker 1: The project deadline is next Friday.",
+        "Speaker 2: That's tighter than I thought.",
+        "Speaker 1: We'll need to work fast."
+    ],
+    "question": "When is the project deadline?",
+    "answers": [
+        "next Friday"
+    ],
+    "vi": "Hạn chót của dự án là khi nào? → Thứ Sáu tới"
+  },
+  {
+    "lines": [
+        "Speaker 1: Have you tried the new restaurant downtown?",
+        "Speaker 2: Not yet, is it good?",
+        "Speaker 1: Yes, the food is amazing."
+    ],
+    "question": "What does the man think of the food?",
+    "answers": [
+        "it's amazing",
+        "amazing"
+    ],
+    "vi": "Người đàn ông nghĩ gì về món ăn? → Rất tuyệt"
+  },
+  {
+    "lines": [
+        "Speaker 1: I locked myself out of the house.",
+        "Speaker 2: Do you have a spare key?",
+        "Speaker 1: Yes, my neighbor has one."
+    ],
+    "question": "Who has the spare key?",
+    "answers": [
+        "the neighbor",
+        "his neighbor"
+    ],
+    "vi": "Ai có chìa khóa dự phòng? → Hàng xóm của anh ấy"
+  },
+  {
+    "lines": [
+        "Speaker 1: We should send a follow-up email.",
+        "Speaker 2: I'll write it right now.",
+        "Speaker 1: Thanks, please copy me."
+    ],
+    "question": "What does the woman decide to do?",
+    "answers": [
+        "write a follow-up email",
+        "write the email"
+    ],
+    "vi": "Người phụ nữ sẽ làm gì? → Viết email theo dõi"
+  },
+  {
+    "lines": [
+        "Speaker 1: My tablet screen cracked this morning.",
+        "Speaker 2: That's too bad. Can it be fixed?",
+        "Speaker 1: I hope so."
+    ],
+    "question": "When did the man's phone screen crack?",
+    "answers": [
+        "yesterday"
+    ],
+    "vi": "Màn hình điện thoại bị nứt khi nào? → Hôm qua"
+  },
+  {
+    "lines": [
+        "Speaker 1: Are you free for lunch tomorrow?",
+        "Speaker 2: Sure, what time works for you?",
+        "Speaker 1: How about noon?"
+    ],
+    "question": "What time does the man suggest for lunch?",
+    "answers": [
+        "noon",
+        "twelve"
+    ],
+    "vi": "Người đàn ông đề nghị ăn trưa lúc mấy giờ? → Giữa trưa"
+  },
+  {
+    "lines": [
+        "Speaker 1: The heater in my office isn't working.",
+        "Speaker 2: I'll ask maintenance to check it.",
+        "Speaker 1: Thank you so much."
+    ],
+    "question": "How does the woman respond?",
+    "answers": [
+        "ask maintenance to check it",
+        "call maintenance"
+    ],
+    "vi": "Người phụ nữ sẽ làm gì? → Nhờ bộ phận bảo trì kiểm tra"
+  },
+  {
+    "lines": [
+        "Speaker 1: I need to renew my ID card.",
+        "Speaker 2: The office closes at four today.",
+        "Speaker 1: I'll go right now then."
+    ],
+    "question": "What time does the office close today?",
+    "answers": [
+        "at four",
+        "four o'clock"
+    ],
+    "vi": "Văn phòng đóng cửa lúc mấy giờ hôm nay? → Bốn giờ"
+  },
+  {
+    "lines": [
+        "Speaker 1: Has the parcel arrived yet?",
+        "Speaker 2: Yes, it came this afternoon.",
+        "Speaker 1: Great, I'll open it now."
+    ],
+    "question": "When did the package arrive?",
+    "answers": [
+        "this afternoon"
+    ],
+    "vi": "Gói hàng đến khi nào? → Chiều nay"
+  },
+  {
+    "lines": [
+        "Speaker 1: I'm thinking of taking a cooking class.",
+        "Speaker 2: That sounds fun. Which one?",
+        "Speaker 1: A Vietnamese cooking class."
+    ],
+    "question": "What kind of class is the man considering?",
+    "answers": [
+        "a Vietnamese cooking class",
+        "cooking class"
+    ],
+    "vi": "Người đàn ông đang cân nhắc lớp học nào? → Lớp nấu ăn món Việt"
+  },
+  {
+    "lines": [
+        "Speaker 1: The customer complained about the delivery.",
+        "Speaker 2: What was the problem exactly?",
+        "Speaker 1: It arrived two days late."
+    ],
+    "question": "What was the customer's complaint about?",
+    "answers": [
+        "a late delivery",
+        "the delivery was late"
+    ],
+    "vi": "Khách hàng phàn nàn về điều gì? → Giao hàng trễ"
+  },
+  {
+    "lines": [
+        "Speaker 1: I need a ride to the airport tomorrow.",
+        "Speaker 2: What time is your flight?",
+        "Speaker 1: It's at seven in the morning."
+    ],
+    "question": "What time is the man's flight?",
+    "answers": [
+        "seven in the morning",
+        "at seven"
+    ],
+    "vi": "Chuyến bay của người đàn ông lúc mấy giờ? → Bảy giờ sáng"
+  },
+  {
+    "lines": [
+        "Speaker 1: The report has a few mistakes.",
+        "Speaker 2: I'll fix them right away.",
+        "Speaker 1: Thanks, please send it again after."
+    ],
+    "question": "What will the man do?",
+    "answers": [
+        "fix the mistakes",
+        "fix them"
+    ],
+    "vi": "Người đàn ông sẽ làm gì? → Sửa các lỗi"
+  },
+  {
+    "lines": [
+        "Speaker 1: My knee has been hurting lately.",
+        "Speaker 2: Maybe you should see a doctor.",
+        "Speaker 1: I'll make an appointment."
+    ],
+    "question": "What does the woman suggest?",
+    "answers": [
+        "seeing a doctor",
+        "see a doctor"
+    ],
+    "vi": "Người phụ nữ đề nghị gì? → Đi khám bác sĩ"
+  },
+  {
+    "lines": [
+        "Speaker 1: Can we reschedule tomorrow's meeting?",
+        "Speaker 2: Sure, how about Thursday instead?",
+        "Speaker 1: Thursday works for me."
+    ],
+    "question": "What day is the meeting rescheduled to?",
+    "answers": [
+        "Thursday"
+    ],
+    "vi": "Cuộc họp được dời sang ngày nào? → Thứ Năm"
+  },
+  {
+    "lines": [
+        "Speaker 1: I think I left the stove on.",
+        "Speaker 2: You should go back and check.",
+        "Speaker 1: You're right, I'll go now."
+    ],
+    "question": "What does the woman suggest?",
+    "answers": [
+        "going back to check",
+        "check the stove"
+    ],
+    "vi": "Người phụ nữ đề nghị gì? → Quay lại kiểm tra"
+  },
+  {
+    "lines": [
+        "Speaker 1: The vending machine ate my money.",
+        "Speaker 2: You should report it to the office.",
+        "Speaker 1: Good idea, I'll do that."
+    ],
+    "question": "What does the woman suggest?",
+    "answers": [
+        "reporting it to the office",
+        "report it"
+    ],
+    "vi": "Người phụ nữ đề nghị gì? → Báo cho văn phòng"
+  },
+  {
+    "lines": [
+        "Speaker 1: We should update the company website.",
+        "Speaker 2: I agree, it looks outdated.",
+        "Speaker 1: Let's start next week."
+    ],
+    "question": "When will they start updating the website?",
+    "answers": [
+        "next week"
+    ],
+    "vi": "Khi nào họ sẽ bắt đầu cập nhật trang web? → Tuần sau"
+  },
+  {
+    "lines": [
+        "Speaker 1: I forgot my lunch at home today.",
+        "Speaker 2: You can order something from the cafe.",
+        "Speaker 1: Good idea, thanks."
+    ],
+    "question": "What does the man suggest?",
+    "answers": [
+        "ordering from the cafe",
+        "order from the cafe"
+    ],
+    "vi": "Người đàn ông đề nghị gì? → Đặt đồ ăn từ quán cà phê"
+  },
+  {
+    "lines": [
+        "Speaker 1: The air conditioner is making a strange noise.",
+        "Speaker 2: I'll call a technician tomorrow.",
+        "Speaker 1: Thanks, it's really loud."
+    ],
+    "question": "When will the woman call a technician?",
+    "answers": [
+        "tomorrow"
+    ],
+    "vi": "Khi nào người phụ nữ sẽ gọi kỹ thuật viên? → Ngày mai"
+  },
+  {
+    "lines": [
+        "Speaker 1: Our sales dropped last quarter.",
+        "Speaker 2: We need a new marketing plan.",
+        "Speaker 1: I'll set up a meeting about it."
+    ],
+    "question": "What does the man suggest?",
+    "answers": [
+        "a new marketing plan",
+        "new marketing plan"
+    ],
+    "vi": "Người đàn ông đề nghị gì? → Một kế hoạch tiếp thị mới"
+  },
+  {
+    "lines": [
+        "Speaker 1: I can't open this email attachment.",
+        "Speaker 2: Try downloading it first.",
+        "Speaker 1: Okay, let me try."
+    ],
+    "question": "What does the woman suggest?",
+    "answers": [
+        "downloading it first",
+        "download it first"
+    ],
+    "vi": "Người phụ nữ đề nghị gì? → Tải tệp về trước"
+  },
+  {
+    "lines": [
+        "Speaker 1: The kids want to go to the zoo.",
+        "Speaker 2: Let's go this Saturday then.",
+        "Speaker 1: They'll be so excited."
+    ],
+    "question": "When will they go to the zoo?",
+    "answers": [
+        "this Saturday",
+        "Saturday"
+    ],
+    "vi": "Khi nào họ sẽ đi sở thú? → Thứ Bảy này"
+  },
+  {
+    "lines": [
+        "Speaker 1: I need to exchange this shirt.",
+        "Speaker 2: Do you have the receipt?",
+        "Speaker 1: Yes, it's right here."
+    ],
+    "question": "What does the man need to exchange the shirt?",
+    "answers": [
+        "the receipt",
+        "a receipt"
+    ],
+    "vi": "Người đàn ông cần gì để đổi áo? → Hóa đơn"
+  },
+  {
+    "lines": [
+        "Speaker 1: The garden needs watering today.",
+        "Speaker 2: I already did it this morning.",
+        "Speaker 1: Oh great, thank you."
+    ],
+    "question": "When did the woman water the garden?",
+    "answers": [
+        "this morning"
+    ],
+    "vi": "Người phụ nữ tưới vườn khi nào? → Sáng nay"
+  },
+  {
+    "lines": [
+        "Speaker 1: The client wants to change the contract terms.",
+        "Speaker 2: Let's review it together this afternoon.",
+        "Speaker 1: Sounds good, see you then."
+    ],
+    "question": "When will they review the contract?",
+    "answers": [
+        "this afternoon"
+    ],
+    "vi": "Khi nào họ sẽ xem lại hợp đồng? → Chiều nay"
+  }
+];
+
+// Part D — Sentence Completion (type one word, 25 seconds)
+const COMPLETION_BANK = [
+  {
+    "blankTpl": "I forgot my umbrella, so I got ___ on the way home.",
+    "answers": [
+      "wet"
+    ],
+    "vi": "Tôi quên mang ô nên bị ướt trên đường về nhà."
+  },
+  {
+    "blankTpl": "Could you please ___ the door on your way out?",
+    "answers": [
+      "close",
+      "shut",
+      "lock"
+    ],
+    "vi": "Bạn có thể đóng cửa khi ra ngoài được không?"
+  },
+  {
+    "blankTpl": "The train was ___ by twenty minutes this morning.",
+    "answers": [
+      "delayed"
+    ],
+    "vi": "Chuyến tàu sáng nay bị trễ hai mươi phút."
+  },
+  {
+    "blankTpl": "She is very ___ about starting her new job next week.",
+    "answers": [
+      "excited"
+    ],
+    "vi": "Cô ấy rất háo hức về việc bắt đầu công việc mới vào tuần tới."
+  },
+  {
+    "blankTpl": "We need to ___ a decision before the end of the week.",
+    "answers": [
+      "make"
+    ],
+    "vi": "Chúng ta cần đưa ra quyết định trước cuối tuần."
+  },
+  {
+    "blankTpl": "He currently works ___ in a small company downtown.",
+    "answers": [
+      "currently"
+    ],
+    "vi": "Hiện tại anh ấy đang làm việc ở một công ty nhỏ ở trung tâm thành phố."
+  },
+  {
+    "blankTpl": "Please ___ your seatbelt before the plane takes off.",
+    "answers": [
+      "fasten"
+    ],
+    "vi": "Vui lòng thắt dây an toàn trước khi máy bay cất cánh."
+  },
+  {
+    "blankTpl": "The manager asked everyone to ___ the meeting on time.",
+    "answers": [
+      "attend"
+    ],
+    "vi": "Người quản lý yêu cầu mọi người tham dự cuộc họp đúng giờ."
+  },
+  {
+    "blankTpl": "The report needs to be ___ before Friday's deadline.",
+    "answers": [
+      "submitted",
+      "finished"
+    ],
+    "vi": "Báo cáo cần được nộp trước hạn chót vào thứ Sáu."
+  },
+  {
+    "blankTpl": "The restaurant was fully ___ , so we had to wait.",
+    "answers": [
+      "booked",
+      "reserved"
+    ],
+    "vi": "Nhà hàng đã kín chỗ nên chúng tôi phải chờ."
+  },
+  {
+    "blankTpl": "It's important to ___ enough sleep before a big exam.",
+    "answers": [
+      "get"
+    ],
+    "vi": "Điều quan trọng là ngủ đủ giấc trước một kỳ thi lớn."
+  },
+  {
+    "blankTpl": "The company decided to ___ its prices next month.",
+    "answers": [
+      "raise",
+      "increase"
+    ],
+    "vi": "Công ty quyết định tăng giá vào tháng tới."
+  }
+,
+  {
+    "blankTpl": "I spilled coffee on my shirt, so I had to go ___.",
+    "answers": [
+        "home",
+        "back home"
+    ],
+    "vi": "Tôi làm đổ cà phê lên áo nên phải về nhà."
+  },
+  {
+    "blankTpl": "Could you please ___ the window? It's cold in here.",
+    "answers": [
+        "close",
+        "shut"
+    ],
+    "vi": "Bạn có thể đóng cửa sổ lại không? Ở đây lạnh quá."
+  },
+  {
+    "blankTpl": "The bus was ___ by fifteen minutes this morning.",
+    "answers": [
+        "delayed",
+        "late"
+    ],
+    "vi": "Xe buýt sáng nay bị trễ mười lăm phút."
+  },
+  {
+    "blankTpl": "He seemed ___ during the interview yesterday.",
+    "answers": [
+        "nervous",
+        "calm",
+        "confident"
+    ],
+    "vi": "Anh ấy có vẻ lo lắng trong buổi phỏng vấn hôm qua."
+  },
+  {
+    "blankTpl": "We need to ___ the meeting to next Monday.",
+    "answers": [
+        "postpone",
+        "reschedule",
+        "move"
+    ],
+    "vi": "Chúng ta cần dời cuộc họp sang thứ Hai tới."
+  },
+  {
+    "blankTpl": "The soup tastes a little too ___ for me.",
+    "answers": [
+        "salty"
+    ],
+    "vi": "Món súp này hơi mặn đối với tôi."
+  },
+  {
+    "blankTpl": "Please ___ the door when you leave the office.",
+    "answers": [
+        "lock"
+    ],
+    "vi": "Vui lòng khóa cửa khi bạn rời văn phòng."
+  },
+  {
+    "blankTpl": "He was ___ for the meeting because of traffic.",
+    "answers": [
+        "late"
+    ],
+    "vi": "Anh ấy đến trễ cuộc họp vì kẹt xe."
+  },
+  {
+    "blankTpl": "I need to ___ some money before the trip.",
+    "answers": [
+        "save",
+        "borrow"
+    ],
+    "vi": "Tôi cần tiết kiệm tiền trước chuyến đi."
+  },
+  {
+    "blankTpl": "The copier upstairs is ___ this week.",
+    "answers": [
+        "broken",
+        "out of order"
+    ],
+    "vi": "Máy photocopy ở tầng trên bị hỏng trong tuần này."
+  },
+  {
+    "blankTpl": "Could you ___ me a favor and pick up the parcel?",
+    "answers": [
+        "do"
+    ],
+    "vi": "Bạn có thể giúp tôi lấy bưu kiện được không?"
+  },
+  {
+    "blankTpl": "The weather is expected to be ___ tomorrow.",
+    "answers": [
+        "sunny",
+        "rainy",
+        "cloudy"
+    ],
+    "vi": "Thời tiết dự kiến sẽ nắng vào ngày mai."
+  },
+  {
+    "blankTpl": "I have to ___ this report before five o'clock.",
+    "answers": [
+        "finish",
+        "submit"
+    ],
+    "vi": "Tôi phải hoàn thành báo cáo này trước năm giờ."
+  },
+  {
+    "blankTpl": "The children were ___ after playing all afternoon.",
+    "answers": [
+        "tired"
+    ],
+    "vi": "Bọn trẻ mệt sau khi chơi cả buổi chiều."
+  },
+  {
+    "blankTpl": "We ran ___ of coffee in the office kitchen.",
+    "answers": [
+        "out"
+    ],
+    "vi": "Chúng tôi hết cà phê trong bếp văn phòng."
+  },
+  {
+    "blankTpl": "She ___ her keys somewhere in the office.",
+    "answers": [
+        "lost",
+        "misplaced"
+    ],
+    "vi": "Cô ấy làm mất chìa khóa ở đâu đó trong văn phòng."
+  },
+  {
+    "blankTpl": "Please ___ the invoice to the client today.",
+    "answers": [
+        "send"
+    ],
+    "vi": "Vui lòng gửi hóa đơn cho khách hàng hôm nay."
+  },
+  {
+    "blankTpl": "The store is ___ until nine every night.",
+    "answers": [
+        "open"
+    ],
+    "vi": "Cửa hàng mở cửa đến chín giờ mỗi tối."
+  },
+  {
+    "blankTpl": "I need to ___ my phone; the battery is almost dead.",
+    "answers": [
+        "charge"
+    ],
+    "vi": "Tôi cần sạc điện thoại vì pin sắp hết."
+  },
+  {
+    "blankTpl": "He was ___ to hear the good news.",
+    "answers": [
+        "happy",
+        "surprised",
+        "glad"
+    ],
+    "vi": "Anh ấy vui khi nghe tin tốt."
+  },
+  {
+    "blankTpl": "We need to ___ this issue with the supplier soon.",
+    "answers": [
+        "discuss",
+        "resolve"
+    ],
+    "vi": "Chúng ta cần bàn bạc vấn đề này với nhà cung cấp sớm."
+  },
+  {
+    "blankTpl": "The kids will ___ home late because of the school trip.",
+    "answers": [
+        "get",
+        "come"
+    ],
+    "vi": "Bọn trẻ sẽ về nhà muộn vì có chuyến dã ngoại của trường."
+  },
+  {
+    "blankTpl": "I need to ___ a new password for my account.",
+    "answers": [
+        "create",
+        "set"
+    ],
+    "vi": "Tôi cần tạo mật khẩu mới cho tài khoản."
+  },
+  {
+    "blankTpl": "The traffic was so ___ that I was late for work.",
+    "answers": [
+        "heavy",
+        "bad"
+    ],
+    "vi": "Giao thông đông đến mức tôi đi làm trễ."
+  },
+  {
+    "blankTpl": "Please make sure to ___ the lights before leaving.",
+    "answers": [
+        "turn off"
+    ],
+    "vi": "Hãy nhớ tắt đèn trước khi ra về."
+  },
+  {
+    "blankTpl": "I ___ my wallet at the restaurant last night.",
+    "answers": [
+        "forgot",
+        "left"
+    ],
+    "vi": "Tối qua tôi để quên ví ở nhà hàng."
+  },
+  {
+    "blankTpl": "The company plans to ___ ten new employees this year.",
+    "answers": [
+        "hire"
+    ],
+    "vi": "Công ty dự định tuyển mười nhân viên mới trong năm nay."
+  },
+  {
+    "blankTpl": "She felt ___ after the long flight.",
+    "answers": [
+        "exhausted",
+        "tired"
+    ],
+    "vi": "Cô ấy cảm thấy kiệt sức sau chuyến bay dài."
+  },
+  {
+    "blankTpl": "Could you please ___ the volume? It's too loud.",
+    "answers": [
+        "lower",
+        "turn down"
+    ],
+    "vi": "Bạn có thể vặn nhỏ âm lượng không? To quá."
+  },
+  {
+    "blankTpl": "We need to ___ this issue before the client calls.",
+    "answers": [
+        "fix",
+        "resolve"
+    ],
+    "vi": "Chúng ta cần xử lý vấn đề này trước khi khách hàng gọi."
+  },
+  {
+    "blankTpl": "The train station is ___ to my apartment.",
+    "answers": [
+        "close",
+        "near"
+    ],
+    "vi": "Ga tàu ở gần căn hộ của tôi."
+  },
+  {
+    "blankTpl": "I need to ___ my dentist appointment to next week.",
+    "answers": [
+        "reschedule",
+        "move"
+    ],
+    "vi": "Tôi cần dời lịch hẹn nha sĩ sang tuần sau."
+  },
+  {
+    "blankTpl": "The manager was ___ with the team's performance.",
+    "answers": [
+        "satisfied",
+        "pleased"
+    ],
+    "vi": "Quản lý hài lòng với kết quả làm việc của nhóm."
+  },
+  {
+    "blankTpl": "Please ___ the form and return it by Friday.",
+    "answers": [
+        "complete",
+        "fill out"
+    ],
+    "vi": "Vui lòng điền vào mẫu đơn và nộp lại trước thứ Sáu."
+  },
+  {
+    "blankTpl": "The soup needs a little more ___ to taste better.",
+    "answers": [
+        "salt",
+        "seasoning"
+    ],
+    "vi": "Món súp cần thêm chút muối để ngon hơn."
+  },
+  {
+    "blankTpl": "He ___ his car to work every day.",
+    "answers": [
+        "drives"
+    ],
+    "vi": "Anh ấy lái xe đi làm mỗi ngày."
+  },
+  {
+    "blankTpl": "The Wi-Fi keeps ___ during the video call.",
+    "answers": [
+        "disconnecting",
+        "dropping"
+    ],
+    "vi": "Wi-Fi liên tục bị ngắt kết nối trong cuộc gọi video."
+  },
+  {
+    "blankTpl": "We are ___ to move into the new office next month.",
+    "answers": [
+        "planning"
+    ],
+    "vi": "Chúng tôi đang dự định chuyển vào văn phòng mới vào tháng sau."
+  },
+  {
+    "blankTpl": "The doctor advised her to ___ more water every day.",
+    "answers": [
+        "drink"
+    ],
+    "vi": "Bác sĩ khuyên cô ấy uống nhiều nước hơn mỗi ngày."
+  },
+  {
+    "blankTpl": "I need to ___ the report before I leave tonight.",
+    "answers": [
+        "finish",
+        "complete"
+    ],
+    "vi": "Tôi cần hoàn thành báo cáo trước khi rời đi tối nay."
+  },
+  {
+    "blankTpl": "The landlord agreed to ___ the broken window.",
+    "answers": [
+        "fix",
+        "repair"
+    ],
+    "vi": "Chủ nhà đồng ý sửa cửa sổ bị hỏng."
+  },
+  {
+    "blankTpl": "She was ___ when she heard about the promotion.",
+    "answers": [
+        "thrilled",
+        "excited"
+    ],
+    "vi": "Cô ấy rất phấn khích khi nghe tin thăng chức."
+  },
+  {
+    "blankTpl": "Please ___ your badge before entering the building.",
+    "answers": [
+        "show",
+        "scan"
+    ],
+    "vi": "Vui lòng xuất trình thẻ trước khi vào tòa nhà."
+  },
+  {
+    "blankTpl": "We need to ___ the client about the delay.",
+    "answers": [
+        "inform",
+        "notify",
+        "tell"
+    ],
+    "vi": "Chúng ta cần thông báo cho khách hàng về sự chậm trễ."
+  },
+  {
+    "blankTpl": "The bakery ___ fresh bread every morning.",
+    "answers": [
+        "bakes",
+        "makes"
+    ],
+    "vi": "Tiệm bánh làm bánh mì tươi mỗi sáng."
+  },
+  {
+    "blankTpl": "I need to ___ these documents before the audit.",
+    "answers": [
+        "organize",
+        "prepare"
+    ],
+    "vi": "Tôi cần sắp xếp các tài liệu này trước đợt kiểm toán."
+  },
+  {
+    "blankTpl": "He ___ to the gym three times a week.",
+    "answers": [
+        "goes"
+    ],
+    "vi": "Anh ấy đi đến phòng gym ba lần mỗi tuần."
+  },
+  {
+    "blankTpl": "The meeting room needs to be ___ before the interview.",
+    "answers": [
+        "cleaned",
+        "tidied"
+    ],
+    "vi": "Phòng họp cần được dọn dẹp trước buổi phỏng vấn."
+  },
+  {
+    "blankTpl": "She ___ the email to the wrong department by mistake.",
+    "answers": [
+        "sent"
+    ],
+    "vi": "Cô ấy đã gửi nhầm email đến sai phòng ban."
+  },
+  {
+    "blankTpl": "We should ___ a backup plan in case it rains.",
+    "answers": [
+        "have",
+        "prepare"
+    ],
+    "vi": "Chúng ta nên chuẩn bị kế hoạch dự phòng trong trường hợp trời mưa."
+  }
+];
+
+// Part E — Dictation (type exactly what you hear, 25 seconds)
+const DICTATION_BANK = [
+  {
+    "en": "The kitchen needs to be cleaned before the guests arrive.",
+    "vi": "Nhà bếp cần được dọn dẹp trước khi khách đến."
+  },
+  {
+    "en": "The store closes at nine on weekdays.",
+    "vi": "Cửa hàng đóng cửa lúc chín giờ vào các ngày trong tuần."
+  },
+  {
+    "en": "She always arrives at the office before everyone else.",
+    "vi": "Cô ấy luôn đến văn phòng trước mọi người."
+  },
+  {
+    "en": "We should double check the numbers before sending the report.",
+    "vi": "Chúng ta nên kiểm tra lại các con số trước khi gửi báo cáo."
+  },
+  {
+    "en": "The children were playing in the park after school.",
+    "vi": "Bọn trẻ đang chơi trong công viên sau giờ học."
+  },
+  {
+    "en": "I left my phone charging in the bedroom.",
+    "vi": "Tôi để điện thoại đang sạc trong phòng ngủ."
+  },
+  {
+    "en": "Traffic was heavy on the way to the airport.",
+    "vi": "Giao thông đông đúc trên đường đến sân bay."
+  },
+  {
+    "en": "He usually reads the news before breakfast.",
+    "vi": "Anh ấy thường đọc tin tức trước bữa sáng."
+  },
+  {
+    "en": "The invoice was sent to the wrong email address.",
+    "vi": "Hóa đơn đã được gửi nhầm địa chỉ email."
+  },
+  {
+    "en": "Our team will present the results next Monday.",
+    "vi": "Nhóm của chúng tôi sẽ trình bày kết quả vào thứ Hai tới."
+  },
+  {
+    "en": "The weather forecast says it will rain tomorrow.",
+    "vi": "Dự báo thời tiết cho biết ngày mai trời sẽ mưa."
+  },
+  {
+    "en": "I appreciate you taking the time to help me.",
+    "vi": "Tôi rất cảm kích vì bạn đã dành thời gian giúp tôi."
+  }
+,
+  {
+    "en": "The office will be closed for the public holiday next Monday.",
+    "vi": "Văn phòng sẽ đóng cửa vào ngày lễ thứ Hai tới."
+  },
+  {
+    "en": "Please make sure all the windows are closed before you leave.",
+    "vi": "Hãy đảm bảo tất cả cửa sổ đã được đóng trước khi bạn rời đi."
+  },
+  {
+    "en": "The manager will review our proposal sometime this week.",
+    "vi": "Quản lý sẽ xem xét đề xuất của chúng tôi vào một thời điểm trong tuần này."
+  },
+  {
+    "en": "My family usually has dinner together every evening.",
+    "vi": "Gia đình tôi thường ăn tối cùng nhau mỗi buổi tối."
+  },
+  {
+    "en": "The weather has been unusually cold for this time of year.",
+    "vi": "Thời tiết bất thường lạnh vào thời điểm này trong năm."
+  },
+  {
+    "en": "We need to order new chairs for the conference room.",
+    "vi": "Chúng tôi cần đặt ghế mới cho phòng họp."
+  },
+  {
+    "en": "She spent the whole weekend cleaning her apartment.",
+    "vi": "Cô ấy dành cả cuối tuần để dọn dẹp căn hộ."
+  },
+  {
+    "en": "The company announced a new policy about remote work.",
+    "vi": "Công ty đã công bố chính sách mới về làm việc từ xa."
+  },
+  {
+    "en": "I usually take the earliest bus to avoid the traffic.",
+    "vi": "Tôi thường đi chuyến xe buýt sớm nhất để tránh kẹt xe."
+  },
+  {
+    "en": "The doctor recommended more rest and less stress.",
+    "vi": "Bác sĩ khuyên nên nghỉ ngơi nhiều hơn và giảm căng thẳng."
+  },
+  {
+    "en": "Our supplier promised to deliver the goods by Friday.",
+    "vi": "Nhà cung cấp của chúng tôi hứa giao hàng trước thứ Sáu."
+  },
+  {
+    "en": "The children were excited to open their birthday presents.",
+    "vi": "Bọn trẻ rất hào hứng mở quà sinh nhật."
+  },
+  {
+    "en": "The new software update fixed several bugs in the system.",
+    "vi": "Bản cập nhật phần mềm mới đã sửa một số lỗi trong hệ thống."
+  },
+  {
+    "en": "My neighbor kindly watered my plants while I was away.",
+    "vi": "Hàng xóm của tôi tốt bụng tưới cây giúp tôi trong lúc tôi đi vắng."
+  },
+  {
+    "en": "We are still waiting for the client to confirm the order.",
+    "vi": "Chúng tôi vẫn đang chờ khách hàng xác nhận đơn hàng."
+  },
+  {
+    "en": "The train station was crowded during the morning rush hour.",
+    "vi": "Ga tàu đông đúc vào giờ cao điểm buổi sáng."
+  },
+  {
+    "en": "I need to finish packing before we leave for the airport.",
+    "vi": "Tôi cần hoàn thành đóng gói trước khi chúng tôi ra sân bay."
+  },
+  {
+    "en": "The bakery near my house sells the best bread in town.",
+    "vi": "Tiệm bánh gần nhà tôi bán bánh mì ngon nhất trong khu vực."
+  },
+  {
+    "en": "Our team worked overtime to meet the tight deadline.",
+    "vi": "Nhóm chúng tôi làm thêm giờ để kịp hạn chót gấp gáp."
+  },
+  {
+    "en": "She decided to take a short vacation after months of hard work.",
+    "vi": "Cô ấy quyết định nghỉ phép ngắn sau nhiều tháng làm việc vất vả."
+  },
+  {
+    "en": "The landlord raised the rent starting from next month.",
+    "vi": "Chủ nhà tăng tiền thuê bắt đầu từ tháng sau."
+  },
+  {
+    "en": "I forgot to bring my charger, so my phone died at noon.",
+    "vi": "Tôi quên mang sạc nên điện thoại hết pin vào buổi trưa."
+  },
+  {
+    "en": "The customer service team handled the complaint quickly.",
+    "vi": "Đội chăm sóc khách hàng xử lý khiếu nại rất nhanh."
+  },
+  {
+    "en": "We are thinking about renovating the kitchen next year.",
+    "vi": "Chúng tôi đang nghĩ đến việc cải tạo nhà bếp vào năm sau."
+  },
+  {
+    "en": "The road to the office was blocked because of construction.",
+    "vi": "Con đường đến văn phòng bị chặn vì đang thi công."
+  },
+  {
+    "en": "My colleague offered to cover my shift this weekend.",
+    "vi": "Đồng nghiệp của tôi đề nghị làm thay ca cho tôi vào cuối tuần này."
+  },
+  {
+    "en": "The airline changed our flight schedule at the last minute.",
+    "vi": "Hãng hàng không thay đổi lịch bay của chúng tôi vào phút chót."
+  },
+  {
+    "en": "I always check the weather forecast before leaving home.",
+    "vi": "Tôi luôn kiểm tra dự báo thời tiết trước khi rời nhà."
+  },
+  {
+    "en": "The company will hold its annual meeting next Thursday.",
+    "vi": "Công ty sẽ tổ chức cuộc họp thường niên vào thứ Năm tới."
+  },
+  {
+    "en": "She had to stay late at the office to finish the project.",
+    "vi": "Cô ấy phải ở lại văn phòng muộn để hoàn thành dự án."
+  },
+  {
+    "en": "The park near our house is a great place for morning walks.",
+    "vi": "Công viên gần nhà chúng tôi là nơi tuyệt vời để đi bộ buổi sáng."
+  },
+  {
+    "en": "We need to back up all the files before updating the system.",
+    "vi": "Chúng ta cần sao lưu tất cả tệp trước khi cập nhật hệ thống."
+  },
+  {
+    "en": "My father taught me how to fix small things around the house.",
+    "vi": "Bố tôi dạy tôi cách sửa những thứ nhỏ trong nhà."
+  },
+  {
+    "en": "The restaurant was fully booked for the entire weekend.",
+    "vi": "Nhà hàng đã kín chỗ trong suốt cuối tuần."
+  },
+  {
+    "en": "I like to plan my tasks before starting work each day.",
+    "vi": "Tôi thích lên kế hoạch công việc trước khi bắt đầu làm mỗi ngày."
+  },
+  {
+    "en": "The clients were impressed with our new product design.",
+    "vi": "Khách hàng ấn tượng với thiết kế sản phẩm mới của chúng tôi."
+  },
+  {
+    "en": "We had to cancel the outdoor event because of the storm.",
+    "vi": "Chúng tôi phải hủy sự kiện ngoài trời vì có bão."
+  },
+  {
+    "en": "The new employee is still learning how the system works.",
+    "vi": "Nhân viên mới vẫn đang học cách hệ thống hoạt động."
+  },
+  {
+    "en": "She always keeps a notebook to write down her ideas.",
+    "vi": "Cô ấy luôn mang theo một cuốn sổ để ghi lại ý tưởng."
+  },
+  {
+    "en": "The traffic light at the corner has been broken for days.",
+    "vi": "Đèn giao thông ở góc đường đã bị hỏng nhiều ngày rồi."
+  },
+  {
+    "en": "We should double check the contract before signing it.",
+    "vi": "Chúng ta nên kiểm tra lại hợp đồng trước khi ký."
+  },
+  {
+    "en": "My sister is learning to drive this summer.",
+    "vi": "Chị tôi đang học lái xe vào mùa hè này."
+  },
+  {
+    "en": "The office building has a small gym on the top floor.",
+    "vi": "Tòa nhà văn phòng có một phòng gym nhỏ ở tầng trên cùng."
+  },
+  {
+    "en": "I need to return these books to the library by Monday.",
+    "vi": "Tôi cần trả những cuốn sách này cho thư viện trước thứ Hai."
+  },
+  {
+    "en": "The company is planning to expand into new markets next year.",
+    "vi": "Công ty đang có kế hoạch mở rộng sang các thị trường mới vào năm sau."
+  },
+  {
+    "en": "Our neighbors are hosting a small party this Saturday.",
+    "vi": "Hàng xóm của chúng tôi sẽ tổ chức một bữa tiệc nhỏ vào thứ Bảy này."
+  },
+  {
+    "en": "The instructions on the package were not very clear.",
+    "vi": "Hướng dẫn trên bao bì không được rõ ràng lắm."
+  },
+  {
+    "en": "I spent the morning organizing files on my computer.",
+    "vi": "Tôi dành cả buổi sáng để sắp xếp tệp trên máy tính."
+  },
+  {
+    "en": "The new manager introduced herself to the whole team.",
+    "vi": "Quản lý mới đã tự giới thiệu bản thân với cả nhóm."
+  },
+  {
+    "en": "We are looking forward to the long weekend next month.",
+    "vi": "Chúng tôi đang mong chờ kỳ nghỉ dài vào tháng sau."
+  }
+];
+
+// Part F — Passage Reconstruction (read for 30s, then reconstruct in your own words in 90s)
+const PASSAGE_BANK = [
+  {
+    "en": "Last weekend, my family and I visited my grandmother in the countryside. We helped her clean the garden and cook dinner together. In the evening, we sat outside and talked about old memories. It was a simple day, but it made all of us very happy.",
+    "vi": "Cuối tuần trước, gia đình tôi đã đến thăm bà ở quê. Chúng tôi giúp bà dọn vườn và cùng nhau nấu bữa tối. Buổi tối, chúng tôi ngồi ngoài sân và nói chuyện về những kỷ niệm xưa. Đó là một ngày đơn giản nhưng khiến tất cả chúng tôi rất vui.",
+    "summary": "My family visited my grandmother in the countryside, helped with the garden and dinner, and spent the evening sharing old memories together — a simple but happy day.",
+    "summaryVi": "Gia đình tôi đến thăm bà ở quê, giúp dọn vườn và nấu ăn, rồi cùng nhau ôn lại kỷ niệm xưa vào buổi tối — một ngày đơn giản nhưng vui vẻ."
+  },
+  {
+    "en": "Our office recently switched to a new project management system. At first, many employees found it confusing and preferred the old way of working. However, after a few training sessions, most people started to see the benefits. Now the whole team finds it easier to track deadlines and share updates.",
+    "vi": "Văn phòng của chúng tôi gần đây đã chuyển sang một hệ thống quản lý dự án mới. Lúc đầu, nhiều nhân viên thấy khó hiểu và thích cách làm việc cũ hơn. Tuy nhiên, sau vài buổi đào tạo, hầu hết mọi người bắt đầu nhận ra lợi ích của nó. Bây giờ cả nhóm thấy dễ dàng hơn khi theo dõi hạn chót và chia sẻ cập nhật.",
+    "summary": "Our office adopted a new project management system that confused staff at first, but after training, the team now finds it easier to track deadlines and share updates.",
+    "summaryVi": "Văn phòng chúng tôi áp dụng hệ thống quản lý dự án mới khiến nhân viên bối rối lúc đầu, nhưng sau đào tạo, nhóm giờ thấy dễ theo dõi hạn chót và chia sẻ cập nhật hơn."
+  },
+  {
+    "en": "Last month, I decided to start learning how to cook. I watched several videos online and tried a few simple recipes. My first attempts were not very good, but I kept practicing every weekend. Now I can cook a few dishes well enough to share with my friends.",
+    "vi": "Tháng trước, tôi quyết định bắt đầu học nấu ăn. Tôi xem vài video trên mạng và thử vài công thức đơn giản. Những lần đầu không ngon lắm, nhưng tôi vẫn kiên trì luyện tập mỗi cuối tuần. Bây giờ tôi có thể nấu vài món đủ ngon để mời bạn bè.",
+    "summary": "I started learning to cook by watching online videos and practicing simple recipes every weekend, and now I can cook well enough to share meals with friends.",
+    "summaryVi": "Tôi bắt đầu học nấu ăn bằng cách xem video trên mạng và luyện tập công thức đơn giản mỗi cuối tuần, giờ tôi đã nấu đủ ngon để mời bạn bè."
+  },
+  {
+    "en": "A new coffee shop opened near my apartment last week. The owner is very friendly and remembers the names of regular customers. The prices are reasonable, and the coffee is excellent. I have already become a regular visitor, going there almost every morning before work.",
+    "vi": "Một quán cà phê mới đã mở gần căn hộ của tôi vào tuần trước. Chủ quán rất thân thiện và nhớ tên của khách quen. Giá cả hợp lý và cà phê rất ngon. Tôi đã trở thành khách quen, gần như sáng nào cũng ghé qua trước khi đi làm.",
+    "summary": "A friendly new coffee shop opened near my apartment with good prices and excellent coffee, and I now visit almost every morning before work.",
+    "summaryVi": "Một quán cà phê mới thân thiện mở gần căn hộ tôi với giá tốt và cà phê ngon, và giờ tôi ghé qua gần như mỗi sáng trước khi đi làm."
+  }
+,
+  {
+    "en": "Every morning, Mr. Tran walks to the small market near his house to buy fresh vegetables and fish. He likes talking to the sellers he has known for years. After breakfast, he takes the bus to his office downtown. In the evening, he usually cooks a simple meal for his wife and reads the newspaper before bed.",
+    "vi": "Mỗi sáng, ông Trần đi bộ đến khu chợ nhỏ gần nhà để mua rau và cá tươi. Ông thích nói chuyện với những người bán hàng mà ông đã quen biết nhiều năm. Sau bữa sáng, ông đi xe buýt đến văn phòng ở trung tâm thành phố. Buổi tối, ông thường nấu một bữa ăn đơn giản cho vợ và đọc báo trước khi đi ngủ.",
+    "summary": "Mr. Tran has a simple daily routine of shopping at the local market, taking the bus to work, and cooking dinner with his wife in the evening.",
+    "summaryVi": "Ông Trần có một thói quen hàng ngày đơn giản là mua sắm ở chợ, đi xe buýt đi làm và nấu bữa tối cùng vợ vào buổi tối."
+  },
+  {
+    "en": "Last month, our office moved to a new building closer to the city center. The new space is brighter and has a bigger kitchen for the staff. At first, some people missed the old office because it felt more familiar. However, after a few weeks, everyone agreed that the new location was much more convenient for meeting clients.",
+    "vi": "Tháng trước, văn phòng của chúng tôi chuyển đến một tòa nhà mới gần trung tâm thành phố hơn. Không gian mới sáng sủa hơn và có bếp lớn hơn cho nhân viên. Lúc đầu, một số người nhớ văn phòng cũ vì nó quen thuộc hơn. Tuy nhiên, sau vài tuần, mọi người đều đồng ý rằng địa điểm mới thuận tiện hơn nhiều để gặp khách hàng.",
+    "summary": "The office moved to a brighter, more convenient new building, and although some missed the old place at first, everyone eventually preferred the new location.",
+    "summaryVi": "Văn phòng chuyển đến tòa nhà mới sáng sủa và thuận tiện hơn, dù ban đầu một số người nhớ nơi cũ nhưng cuối cùng ai cũng thích địa điểm mới hơn."
+  },
+  {
+    "en": "Last weekend, I decided to clean out my closet because it was full of clothes I never wore. I put some old shirts and shoes into a box to donate. My sister helped me sort everything into piles: keep, donate, and throw away. By the end of the day, the closet looked much neater, and I felt relieved to have less clutter.",
+    "vi": "Cuối tuần trước, tôi quyết định dọn dẹp tủ quần áo vì nó đầy những bộ đồ tôi không bao giờ mặc. Tôi cho một số áo và giày cũ vào hộp để quyên góp. Chị tôi giúp tôi phân loại mọi thứ thành các nhóm: giữ lại, quyên góp và vứt bỏ. Đến cuối ngày, tủ quần áo trông gọn gàng hơn nhiều, và tôi cảm thấy nhẹ nhõm vì bớt lộn xộn.",
+    "summary": "The writer cleaned out a cluttered closet with help from their sister, sorting items to keep, donate, or throw away, and ended the day feeling relieved.",
+    "summaryVi": "Người viết dọn dẹp tủ quần áo bừa bộn với sự giúp đỡ của chị gái, phân loại đồ để giữ lại, quyên góp hoặc vứt bỏ, và cảm thấy nhẹ nhõm sau khi hoàn thành."
+  },
+  {
+    "en": "Our team had a big presentation for a new client last week. Everyone was a little nervous because we had only two days to prepare. We stayed late at the office to practice and fix the slides. In the end, the client was impressed with our ideas and agreed to work with us starting next month.",
+    "vi": "Nhóm chúng tôi có một buổi thuyết trình lớn cho khách hàng mới vào tuần trước. Mọi người đều hơi lo lắng vì chỉ có hai ngày để chuẩn bị. Chúng tôi ở lại văn phòng muộn để luyện tập và chỉnh sửa các slide. Cuối cùng, khách hàng ấn tượng với ý tưởng của chúng tôi và đồng ý hợp tác bắt đầu từ tháng sau.",
+    "summary": "Despite limited preparation time, the team worked hard on their presentation and successfully won a new client's business.",
+    "summaryVi": "Dù thời gian chuẩn bị hạn chế, nhóm đã nỗ lực cho buổi thuyết trình và thành công thuyết phục được khách hàng mới hợp tác."
+  },
+  {
+    "en": "When I was young, my grandfather often took me fishing at the river near our village. He taught me how to be patient and quiet while waiting for the fish to bite. We would sit there for hours, sometimes talking and sometimes just enjoying the silence. Those simple mornings are some of my favorite childhood memories.",
+    "vi": "Khi tôi còn nhỏ, ông tôi thường đưa tôi đi câu cá ở con sông gần làng. Ông dạy tôi cách kiên nhẫn và im lặng trong khi chờ cá cắn câu. Chúng tôi thường ngồi đó hàng giờ, đôi khi trò chuyện và đôi khi chỉ tận hưởng sự yên tĩnh. Những buổi sáng đơn giản đó là một trong những kỷ niệm tuổi thơ yêu thích nhất của tôi.",
+    "summary": "The writer fondly remembers fishing trips with their grandfather, who taught them patience during quiet mornings by the river.",
+    "summaryVi": "Người viết nhớ lại những chuyến đi câu cá cùng ông, người đã dạy họ tính kiên nhẫn trong những buổi sáng yên tĩnh bên sông."
+  },
+  {
+    "en": "This morning, our manager called an emergency meeting because one of our biggest clients was unhappy with the delivery delay. We spent an hour discussing what went wrong and how to fix it. In the end, we agreed to send a formal apology and offer a discount on the next order. The client seemed satisfied after our call.",
+    "vi": "Sáng nay, quản lý của chúng tôi gọi một cuộc họp khẩn cấp vì một trong những khách hàng lớn nhất của chúng tôi không hài lòng về việc giao hàng chậm trễ. Chúng tôi dành một giờ để thảo luận về nguyên nhân và cách khắc phục. Cuối cùng, chúng tôi đồng ý gửi lời xin lỗi chính thức và giảm giá cho đơn hàng tiếp theo. Khách hàng có vẻ hài lòng sau cuộc gọi của chúng tôi.",
+    "summary": "After a client complained about a delivery delay, the team held an emergency meeting and resolved the issue with an apology and a discount.",
+    "summaryVi": "Sau khi khách hàng phàn nàn về việc giao hàng trễ, nhóm đã họp khẩn cấp và giải quyết vấn đề bằng lời xin lỗi và một khoản giảm giá."
+  },
+  {
+    "en": "Every Sunday, my whole family gathers at my parents' house for lunch. My mother cooks several traditional dishes while my father prepares the table outside. My siblings and I bring our own children, so the house is always full of noise and laughter. These weekly gatherings help us stay close even though we all live busy lives.",
+    "vi": "Mỗi Chủ Nhật, cả gia đình tôi tụ họp tại nhà bố mẹ để ăn trưa. Mẹ tôi nấu vài món ăn truyền thống trong khi bố tôi chuẩn bị bàn ăn ngoài sân. Anh chị em tôi và tôi đưa con cái đến cùng, nên căn nhà lúc nào cũng đầy tiếng ồn và tiếng cười. Những buổi tụ họp hàng tuần này giúp chúng tôi luôn gần gũi dù mỗi người đều bận rộn.",
+    "summary": "The family gathers every Sunday for a lively lunch that helps them stay close despite their busy lives.",
+    "summaryVi": "Gia đình tụ họp mỗi Chủ Nhật cho bữa trưa vui vẻ, giúp mọi người luôn gần gũi dù cuộc sống bận rộn."
+  },
+  {
+    "en": "Yesterday, I finally went to see a doctor about the pain in my shoulder. She said it was probably caused by sitting at my desk for too long without breaks. She recommended stretching every hour and adjusting my chair. I also bought a small cushion to support my back while working.",
+    "vi": "Hôm qua, cuối cùng tôi cũng đi khám bác sĩ về cơn đau ở vai. Bác sĩ nói có thể là do tôi ngồi làm việc quá lâu mà không nghỉ giải lao. Bác sĩ khuyên nên giãn cơ mỗi giờ và điều chỉnh lại ghế ngồi. Tôi cũng mua một chiếc gối nhỏ để hỗ trợ lưng khi làm việc.",
+    "summary": "A doctor visit revealed that the writer's shoulder pain came from long hours at a desk, leading to advice on stretching and posture.",
+    "summaryVi": "Chuyến khám bác sĩ cho thấy cơn đau vai của người viết là do ngồi làm việc quá lâu, dẫn đến lời khuyên về giãn cơ và tư thế ngồi."
+  },
+  {
+    "en": "Last week, our team finally launched the new website after months of hard work. There were a few small problems on the first day, but we fixed them quickly. Our manager was proud of how everyone handled the pressure. To celebrate, the whole office went out for dinner together on Friday.",
+    "vi": "Tuần trước, nhóm chúng tôi cuối cùng đã ra mắt trang web mới sau nhiều tháng làm việc chăm chỉ. Có một vài vấn đề nhỏ trong ngày đầu tiên, nhưng chúng tôi đã khắc phục nhanh chóng. Quản lý của chúng tôi tự hào về cách mọi người xử lý áp lực. Để ăn mừng, cả văn phòng đã cùng nhau đi ăn tối vào thứ Sáu.",
+    "summary": "After launching a new website and quickly fixing minor issues, the team celebrated their success with a dinner together.",
+    "summaryVi": "Sau khi ra mắt trang web mới và nhanh chóng khắc phục các vấn đề nhỏ, cả nhóm đã ăn mừng thành công bằng một bữa tối cùng nhau."
+  },
+  {
+    "en": "My husband and I decided to plant a small vegetable garden in our backyard this spring. We started with tomatoes, peppers, and herbs because they are easy to grow. Every evening, we water the plants together and talk about our day. It has become one of our favorite ways to relax after work.",
+    "vi": "Vợ chồng tôi quyết định trồng một khu vườn rau nhỏ ở sân sau vào mùa xuân này. Chúng tôi bắt đầu với cà chua, ớt và các loại rau thơm vì chúng dễ trồng. Mỗi buổi tối, chúng tôi tưới cây cùng nhau và trò chuyện về ngày của mình. Đây đã trở thành một trong những cách yêu thích của chúng tôi để thư giãn sau giờ làm.",
+    "summary": "The couple started a small vegetable garden, which has become a relaxing evening activity they enjoy together after work.",
+    "summaryVi": "Cặp vợ chồng bắt đầu trồng một khu vườn rau nhỏ, trở thành hoạt động thư giãn buổi tối mà họ thích cùng nhau sau giờ làm."
+  },
+  {
+    "en": "This morning, the elevator in our building broke down, so everyone had to use the stairs to reach the tenth floor. Many people arrived at work out of breath and a little late. The building manager promised to have it fixed by the end of the day. Some coworkers joked that it was good exercise, even though nobody was happy about it.",
+    "vi": "Sáng nay, thang máy trong tòa nhà của chúng tôi bị hỏng, nên mọi người phải đi cầu thang bộ lên tầng mười. Nhiều người đến chỗ làm thở hổn hển và hơi trễ. Quản lý tòa nhà hứa sẽ sửa xong trước cuối ngày. Một số đồng nghiệp đùa rằng đó là bài tập thể dục tốt, dù không ai thực sự vui vẻ về việc này.",
+    "summary": "A broken elevator forced everyone to climb the stairs to the tenth floor, causing some delays but also a few jokes among coworkers.",
+    "summaryVi": "Thang máy bị hỏng khiến mọi người phải leo cầu thang lên tầng mười, gây trễ giờ nhưng cũng tạo ra vài câu đùa giữa các đồng nghiệp."
+  },
+  {
+    "en": "Two weeks ago, I started taking an online English course to improve my speaking skills for work. I practice for thirty minutes every evening after dinner. At first, it felt difficult to speak confidently, but I am slowly getting more comfortable. My goal is to be able to join client calls in English by the end of the year.",
+    "vi": "Hai tuần trước, tôi bắt đầu học một khóa tiếng Anh trực tuyến để cải thiện kỹ năng nói phục vụ công việc. Tôi luyện tập ba mươi phút mỗi tối sau bữa ăn. Lúc đầu, tôi cảm thấy khó nói một cách tự tin, nhưng tôi đang dần trở nên thoải mái hơn. Mục tiêu của tôi là có thể tham gia các cuộc gọi với khách hàng bằng tiếng Anh vào cuối năm.",
+    "summary": "The writer has been practicing English speaking skills every evening to eventually handle client calls in English by year's end.",
+    "summaryVi": "Người viết đã luyện nói tiếng Anh mỗi tối để cuối năm có thể tham gia các cuộc gọi với khách hàng bằng tiếng Anh."
+  },
+  {
+    "en": "Last Saturday, a sudden storm hit our neighborhood and knocked out the electricity for several hours. My family gathered in the living room with candles and played card games together. Although it was inconvenient, it turned out to be a fun and memorable evening. We even joked about not having power more often.",
+    "vi": "Thứ Bảy tuần trước, một cơn bão bất ngờ ập đến khu phố chúng tôi và làm mất điện trong nhiều giờ. Gia đình tôi tụ tập trong phòng khách với những cây nến và cùng nhau chơi bài. Dù bất tiện, nhưng đó lại trở thành một buổi tối vui vẻ và đáng nhớ. Chúng tôi thậm chí còn đùa rằng nên mất điện thường xuyên hơn.",
+    "summary": "A storm caused a power outage, but the family turned it into a memorable evening of candlelight and card games.",
+    "summaryVi": "Cơn bão gây mất điện, nhưng gia đình đã biến nó thành một buổi tối đáng nhớ với ánh nến và chơi bài."
+  },
+  {
+    "en": "Our company recently introduced a flexible work schedule, allowing employees to start anytime between seven and ten in the morning. Many people were happy because it made commuting easier and less stressful. Some parents especially appreciated being able to drop their kids off at school first. Overall, the change has improved morale across the office.",
+    "vi": "Công ty chúng tôi gần đây đã áp dụng giờ làm việc linh hoạt, cho phép nhân viên bắt đầu bất kỳ lúc nào từ bảy đến mười giờ sáng. Nhiều người vui mừng vì điều này giúp việc di chuyển dễ dàng và bớt căng thẳng hơn. Một số phụ huynh đặc biệt hài lòng vì có thể đưa con đến trường trước. Nhìn chung, thay đổi này đã cải thiện tinh thần làm việc trong văn phòng.",
+    "summary": "A new flexible work schedule made commuting easier for employees, especially parents, and improved overall office morale.",
+    "summaryVi": "Giờ làm việc linh hoạt mới giúp nhân viên, đặc biệt là phụ huynh, di chuyển dễ dàng hơn và cải thiện tinh thần chung của văn phòng."
+  },
+  {
+    "en": "Yesterday afternoon, I went to the bank to open a new savings account. The staff explained the different account types and helped me choose the best option for my goals. It took about thirty minutes to complete all the paperwork. I left feeling satisfied that I finally started saving more seriously for the future.",
+    "vi": "Chiều hôm qua, tôi đến ngân hàng để mở một tài khoản tiết kiệm mới. Nhân viên giải thích các loại tài khoản khác nhau và giúp tôi chọn phương án phù hợp nhất với mục tiêu của mình. Mất khoảng ba mươi phút để hoàn thành tất cả giấy tờ. Tôi rời đi với cảm giác hài lòng vì cuối cùng cũng bắt đầu tiết kiệm nghiêm túc hơn cho tương lai.",
+    "summary": "The writer opened a new savings account at the bank with staff assistance, feeling satisfied about starting to save more seriously.",
+    "summaryVi": "Người viết mở tài khoản tiết kiệm mới tại ngân hàng với sự hỗ trợ của nhân viên, cảm thấy hài lòng vì bắt đầu tiết kiệm nghiêm túc hơn."
+  }
+];
+
+const MODE_INFO = {
+  repeat:        { label:"A. Repeat",                skill:"speaking",  time:6,   ring:"var(--speaking)",  pool:REPEAT_BANK,     round:8 },
+  build:         { label:"B. Sentence Build",         skill:"speaking",  time:8,   ring:"var(--speaking)",  pool:BUILD_BANK,      round:8 },
+  conversations: { label:"C. Conversations",          skill:"listening", time:10,  ring:"var(--listening)", pool:CONV_BANK,       round:8 },
+  completion:    { label:"D. Sentence Completion",    skill:"reading",   time:25,  ring:"var(--reading)",   pool:COMPLETION_BANK, round:8 },
+  dictation:     { label:"E. Dictation",              skill:"listening", time:25,  ring:"var(--listening)", secondSkill:"writing", pool:DICTATION_BANK, round:8 },
+  passage:       { label:"F. Passage Reconstruction", skill:"reading",   time:30,  ring:"var(--reading)",   secondSkill:"writing", pool:PASSAGE_BANK, round:4, writeTime:90 }
+};
+
+const EXAM_SEQUENCE = [
+  { mode:'repeat',        count:16 },
+  { mode:'build',         count:8  },
+  { mode:'conversations', count:12 },
+  { mode:'completion',    count:18 },
+  { mode:'dictation',     count:14 },
+  { mode:'passage',       count:2  }
+];
+
+const scores = {
+  speaking:{correct:0,total:0},
+  listening:{correct:0,total:0},
+  reading:{correct:0,total:0},
+  writing:{correct:0,total:0},
+};
+
+let state = {
+  mode:'repeat', order:[], idx:0, timer:null, ringTimer:null, recognizing:false, hintOpen:false,
+  lastPlayedItem:null, examActive:false, examSeqIdx:0,
+  // Session run/pause control (gated behind the 3 audio checks below).
+  running:false, paused:false, activateFn:null,
+  ringRemaining:0, ringOnExpire:null,
+  wasListening:false, listeningArgs:null,
+  checklist:{ sound:null, mic:null, level:null } // null=not confirmed, true=Đạt, false=Chưa đạt
+};
+let examStartSnapshot = null;
+
+function shuffledIndices(mode, countOverride){
+  const info = MODE_INFO[mode];
+  const arr = info.pool.map((_,i)=>i);
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  const n = (countOverride!=null) ? countOverride : info.round;
+  return arr.slice(0, Math.min(n, arr.length));
+}
+
+function normalize(s){
+  return s.toLowerCase().replace(/[.,!?'"]/g,"").trim().split(/\s+/).filter(Boolean);
+}
+function accuracy(target, attempt){
+  const t = normalize(target), a = normalize(attempt);
+  if(t.length===0) return 0;
+  let hit=0; const pool=[...a];
+  t.forEach(w=>{ const i=pool.indexOf(w); if(i>-1){hit++; pool.splice(i,1);} });
+  return hit/t.length;
+}
+function normWord(s){
+  return (s||"").toLowerCase().replace(/[.,!?'"]/g,"").trim();
+}
+
+let voicePool = [];
+let voicesReady = false;
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const all = window.speechSynthesis.getVoices();
+  if(all.length) voicesReady = true;
+  const enVoices = all.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+  // Prefer offline/local voices over network ("remote") voices. Network
+  // voices stream audio from a cloud TTS service and can silently produce
+  // zero sound (no error event fired) if that endpoint is blocked by a
+  // firewall/proxy or the machine has no internet — a common real-world
+  // cause of "the app opens fine but I hear nothing" on some Windows PCs.
+  const localEnVoices = enVoices.filter(v => v.localService);
+  voicePool = localEnVoices.length ? localEnVoices : enVoices;
+
+  const dbg = document.getElementById('voiceDebug');
+  if(dbg){
+    if(all.length===0){
+      dbg.textContent = 'Voices detected: 0 — this browser/OS has no text-to-speech voices installed at all.';
+    } else {
+      dbg.textContent = `Voices detected: ${all.length} total, ${enVoices.length} English (${localEnVoices.length} offline / ${enVoices.length-localEnVoices.length} network).`;
+    }
+  }
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  // Some Chromium/WebView builds never fire onvoiceschanged at all — poll for
+  // a few seconds after load as a fallback so voicePool still gets populated.
+  let voicePollTries = 0;
+  const voicePoll = setInterval(()=>{
+    voicePollTries++;
+    loadVoices();
+    if(voicesReady || voicePollTries > 20) clearInterval(voicePoll);
+  }, 300);
+}
+
+// Chrome/Edge on some Windows machines silently drop the very first speak()
+// call right after page load (a known browser bug). Firing one near-silent
+// utterance at unlock time — inside a real user click, which browsers
+// require to allow audio — "wakes up" the speech engine so real sentences
+// play reliably afterwards.
+function warmUpSpeech(){
+  if(!('speechSynthesis' in window)) return;
+  try{
+    window.speechSynthesis.resume();
+    const u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// NOTE: this used to be called automatically at unlock time to avoid the mic
+// permission prompt interrupting the first Repeat sentence. Turned out to
+// cause a worse problem for Bluetooth headset users: the instant a page
+// touches getUserMedia, Windows switches a Bluetooth headset from its
+// high-quality music profile (A2DP) to the low-quality call profile
+// (HFP/Hands-Free) for BOTH input and output — making every sentence sound
+// quiet/muffled for the rest of the session, even outside Speaking
+// exercises. So this is no longer auto-called; it only runs on-demand when
+// mic access is actually needed (Test Microphone / Mic Level Test buttons,
+// or the first real Repeat/Build question).
+function warmUpMic(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  navigator.mediaDevices.getUserMedia({ audio:true })
+    .then(stream => stream.getTracks().forEach(t => t.stop()))
+    .catch(()=>{ /* denied or no mic — self-report fallback handles this */ });
+}
+
+// Resolve the browser's microphone permission prompt BEFORE starting
+// SpeechRecognition, instead of letting rec.start() trigger its own prompt
+// internally. Calling SpeechRecognition while a permission dialog is still
+// open/pending is what caused the false "no audio detected" result seen
+// earlier — the recognizer gave up before the user had even answered the
+// dialog.
+//
+// IMPORTANT: on file:// pages, Chrome does NOT reliably remember "Allow
+// while visiting the site" the way it does for https:// pages — it can
+// re-prompt on every single getUserMedia() call within the same session.
+// On file:// this used to re-prompt for mic access on every single question,
+// so the app kept one shared getUserMedia() stream open for the whole
+// session — but that meant a Bluetooth headset stayed in its low-quality
+// call profile the entire time. Now that the app is served over a real
+// https:// origin (GitHub Pages), Chrome reliably remembers "Allow" per
+// origin across separate getUserMedia() calls, so we no longer need to hold
+// the stream open to avoid re-prompts. Instead: acquire the mic only when
+// actually needed, then release it (see releaseSharedMic()) right after each
+// use finishes — the headset drops back to full-quality music mode between
+// questions, and the next mic request still won't show a permission dialog.
+let sharedMicStream = null;
+function ensureMicPermission(onGranted, onDenied){
+  if(sharedMicStream && sharedMicStream.active){ onGranted(); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ onDenied(); return; }
+  navigator.mediaDevices.getUserMedia({ audio:true })
+    .then(stream => { sharedMicStream = stream; onGranted(); })
+    .catch(()=> onDenied());
+}
+
+// Free the mic right after each use so a Bluetooth headset can drop back to
+// its full-quality music profile between questions. Safe to call even if
+// nothing is open. The next getUserMedia() call will re-acquire it — on the
+// https:// origin this happens silently, no permission dialog.
+function releaseSharedMic(){
+  if(sharedMicStream){
+    sharedMicStream.getTracks().forEach(t=>{ try{ t.stop(); }catch(e){} });
+    sharedMicStream = null;
+  }
+}
+
+// Speak one sentence, with an automatic one-time retry using the browser's
+// own default voice (no explicit .voice set) if the first attempt produces
+// no sound within 1.8s or errors out. This protects against the two most
+// common silent-failure causes: a broken/duplicate installed voice, or a
+// network voice whose cloud endpoint is unreachable.
+function speak(text, onStatus, onEnd){
+  if(!('speechSynthesis' in window)){ if(onStatus) onStatus('unsupported'); if(onEnd) onEnd(); return null; }
+  let finished = false;
+  let safetyTimer = null;
+  const finish = ()=>{ if(finished) return; finished = true; clearTimeout(safetyTimer); if(onEnd) onEnd(); };
+  let firstChoice = null;
+  const MAX_TRIES = 3;
+
+  function attempt(tryNum){
+    const useDefaultVoice = tryNum > 0;
+    const u = new SpeechSynthesisUtterance(text);
+    let chosen = null;
+    if(!useDefaultVoice && voicePool.length){
+      chosen = voicePool[Math.floor(Math.random()*voicePool.length)];
+      u.voice = chosen;
+      u.lang = chosen.lang;
+    } else {
+      u.lang = 'en-US';
+    }
+    if(tryNum===0) firstChoice = chosen;
+    u.rate = 0.95;
+    u.volume = 1; // explicit max — SpeechSynthesis has no way to boost past this
+    let started = false;
+    u.onstart = ()=>{ started = true; if(onStatus) onStatus('ok'); };
+    u.onend = finish;
+    u.onerror = (e)=>{
+      const reason = e && e.error;
+      if(finished) return;
+      // 'interrupted'/'canceled' usually mean another speak()/cancel() call
+      // (often from a second tab of this same app fighting over the browser's
+      // single shared speech engine) pre-empted this utterance — not a real
+      // failure. Retry quietly instead of surfacing it as an error.
+      if(tryNum < MAX_TRIES - 1){ attempt(tryNum+1); return; }
+      if(onStatus) onStatus('error', reason);
+      finish();
+    };
+    window.speechSynthesis.resume();
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+    setTimeout(()=>{
+      if(started || finished) return;
+      if(tryNum < MAX_TRIES - 1){ attempt(tryNum+1); return; } // no sound yet — retry
+      if(onStatus) onStatus('silent');
+    }, 1800);
+  }
+
+  attempt(0);
+  safetyTimer = setTimeout(finish, Math.max(8000, text.length*150));
+  return firstChoice;
+}
+
+// Same retry-with-default-voice protection as speak(), applied per line.
+function speakSequential(lines, onDone, onStatus){
+  if(!('speechSynthesis' in window)){ if(onStatus) onStatus('unsupported'); onDone(); return; }
+  window.speechSynthesis.resume();
+  window.speechSynthesis.cancel();
+  let i = 0;
+  let anyStarted = false;
+  const MAX_TRIES = 3;
+  function speakLine(clean, tryNum, onLineDone){
+    const useDefaultVoice = tryNum > 0;
+    const u = new SpeechSynthesisUtterance(clean);
+    if(!useDefaultVoice && voicePool.length){ const v = voicePool[Math.floor(Math.random()*voicePool.length)]; u.voice=v; u.lang=v.lang; }
+    else u.lang='en-US';
+    u.rate = 0.95;
+    u.volume = 1; // explicit max — SpeechSynthesis has no way to boost past this
+    let started = false, done = false;
+    const finishLine = ()=>{ if(done) return; done = true; onLineDone(); };
+    u.onstart = ()=>{ started = true; anyStarted = true; if(onStatus) onStatus('ok'); };
+    u.onend = finishLine;
+    u.onerror = (e)=>{
+      if(done) return;
+      if(tryNum < MAX_TRIES - 1){ speakLine(clean, tryNum+1, onLineDone); return; }
+      if(onStatus) onStatus('error', e && e.error);
+      finishLine();
+    };
+    window.speechSynthesis.speak(u);
+    setTimeout(()=>{
+      if(started || done) return;
+      if(tryNum < MAX_TRIES - 1){ speakLine(clean, tryNum+1, onLineDone); return; }
+    }, 1800);
+    setTimeout(finishLine, Math.max(8000, clean.length*150));
+  }
+  function playNext(){
+    if(i >= lines.length){ onDone(); return; }
+    const clean = lines[i].replace(/^Speaker \d:\s*/,'');
+    speakLine(clean, 0, ()=>{ i++; setTimeout(playNext, 350); });
+  }
+  playNext();
+  if(onStatus) setTimeout(()=>{ if(!anyStarted) onStatus('silent'); }, 1800);
+}
+
+function applySpeechStatus(elId, status, detail){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  if(status==='ok') return; // voiceTag already shows the voice name — leave it as is
+  if(status==='unsupported') el.textContent = '❌ This browser has no text-to-speech support — try Chrome or Edge.';
+  else if(status==='error'){
+    const hint = detail ? ` (${detail})` : '';
+    el.textContent = `⚠️ Speech error${hint} — if you have this app open in more than one tab, close the extra tabs (they fight over the browser's shared speech engine). Otherwise check system volume or try Chrome/Edge.`;
+  }
+  else if(status==='silent') el.textContent = '⚠️ Still no sound after retrying — check: (1) system volume + correct output device selected, (2) this browser tab isn\'t muted, (3) Windows Settings → Time & Language → Speech → Manage voices has an English voice installed. Then tap Play again.';
+}
+
+function recordScore(skill, correct){
+  scores[skill].total++; if(correct) scores[skill].correct++;
+  renderSkillsBar();
+}
+
+// Normally shows cumulative practice % per skill. After finishing a V4SE
+// EXAM run, examResultData holds that attempt's own correct/total per skill
+// — while it's set, the chips switch to showing the raw score (e.g. "13/16")
+// instead of a percentage, so the exam result reads like a real score report.
+// A 5th "Overall" tile always shows the combined average across all 4 skills.
+let examResultData = null;
+function renderSkillsBar(){
+  const defs = [
+    ['speaking','🗣 Speaking'], ['listening','👂 Listening'],
+    ['reading','📖 Reading'], ['writing','✍️ Writing']
+  ];
+  const data = examResultData || scores;
+  const showScore = !!examResultData;
+  let sumCorrect = 0, sumTotal = 0;
+  const tiles = defs.map(([key,label])=>{
+    const s = data[key];
+    sumCorrect += s.correct; sumTotal += s.total;
+    const pct = s.total ? Math.round(100*s.correct/s.total) : 0;
+    const valueText = showScore ? `${s.correct}/${s.total}` : `${pct}%`;
+    return `<div class="skill-chip ${key}">
+      <div class="lbl"><span>${label}</span><span>${valueText}</span></div>
+      <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+  const avgPct = sumTotal ? Math.round(100*sumCorrect/sumTotal) : 0;
+  const avgText = showScore ? `${sumCorrect}/${sumTotal}` : `${avgPct}%`;
+  const avgTile = `<div class="skill-chip overall">
+      <div class="lbl"><span>🎯 Overall</span><span>${avgText}</span></div>
+      <div class="track"><div class="fill" style="width:${avgPct}%"></div></div>
+    </div>`;
+  document.getElementById('skillsBar').innerHTML = tiles + avgTile;
+
+  const cefrEl = document.getElementById('cefrEstimate');
+  if(cefrEl){
+    if(sumTotal === 0){
+      cefrEl.textContent = 'Estimated CEFR level: — (practice a few questions first)';
+    } else {
+      const est = estimateCefr(avgPct);
+      const basis = showScore ? 'this exam attempt' : 'your practice accuracy so far';
+      cefrEl.innerHTML = `Estimated CEFR level: <strong>${est.level}</strong> (≈${est.versantScore}/70 on the Versant scale) — unofficial estimate from ${basis}, not an actual Versant score.`;
+    }
+  }
+}
+
+// UNOFFICIAL estimate only. Maps this app's own %-correct accuracy onto
+// Pearson's officially published Versant English Placement Test score-to-CEFR
+// table (20-70 scale) — source: Pearson, "Relating the Versant English
+// Placement Test to the CEFR" (expert panel standard-setting table).
+// We treat 0% accuracy here as roughly the test's 20-point floor and 100%
+// accuracy as roughly a strong 70 (top of the published table, C1), then
+// apply Pearson's own band cutoffs. This is a rough self-study indicator to
+// give a sense of level — not a substitute for taking the real Versant test.
+function estimateCefr(pct){
+  const versantScore = Math.round(20 + (pct/100)*50);
+  let level;
+  if(versantScore <= 23) level = 'Pre-A1';
+  else if(versantScore <= 33) level = 'A1';
+  else if(versantScore <= 45) level = 'A2';
+  else if(versantScore <= 56) level = 'B1';
+  else if(versantScore <= 65) level = 'B2';
+  else level = 'C1';
+  return { level, versantScore };
+}
+
+function renderDots(){
+  document.getElementById('progressDots').innerHTML = state.order.map((_,i)=>{
+    const cls = i<state.idx ? 'done' : (i===state.idx ? 'current' : '');
+    return `<div class="dot ${cls}"></div>`;
+  }).join('');
+}
+
+function clearTimers(){
+  clearTimeout(state.timer); state.timer=null;
+  clearInterval(state.ringTimer); state.ringTimer=null;
+  if(state.recognition){ try{state.recognition.stop();}catch(e){} }
+}
+
+// Starts (or restarts) the per-question countdown ring. Safe to call again
+// on the same question — e.g. once when the question first appears, then
+// again once the user presses Play/Confirm to give a fresh window for their
+// actual response — because it always clears any timer/interval left over
+// from a previous call first, so an old call never sneaks in and fires
+// onExpire late/twice.
+function startRing(seconds, onExpire){
+  clearTimeout(state.timer); state.timer=null;
+  clearInterval(state.ringTimer); state.ringTimer=null;
+  const ring = document.getElementById('ringFg');
+  const timeEl = document.getElementById('ringTime');
+  if(!ring || !timeEl){ console.error('[V4SE] startRing: ring elements missing, skipping'); return; }
+  ring.style.transition='none';
+  ring.style.strokeDashoffset='0';
+  ring.classList.remove('danger');
+  timeEl.textContent = seconds;
+  const CIRC = 327;
+  void ring.offsetWidth;
+  ring.style.transition = `stroke-dashoffset ${seconds}s linear`;
+  ring.style.strokeDashoffset = CIRC;
+  let remaining = seconds;
+  // Remembered so Pause/Resume can freeze and later restart this exact
+  // countdown (same remaining time, same onExpire) instead of resetting it.
+  state.ringRemaining = remaining;
+  state.ringOnExpire = onExpire;
+  state.ringTimer = setInterval(()=>{
+    remaining -= 1;
+    state.ringRemaining = remaining;
+    timeEl.textContent = Math.max(remaining,0);
+    if(remaining<=2) ring.classList.add('danger');
+    if(remaining<=0){ clearInterval(state.ringTimer); state.ringTimer=null; }
+  },1000);
+  // Wrapped in try/catch + logged: if onExpire ever throws (e.g. a DOM node
+  // it expects is momentarily missing), the error is visible in the console
+  // instead of silently killing the callback before it reaches nextQuestion(),
+  // which would otherwise look like the app "getting stuck" at 0.
+  state.timer = setTimeout(()=>{
+    clearInterval(state.ringTimer); state.ringTimer=null;
+    state.ringOnExpire = null;
+    try{ onExpire(); }
+    catch(err){ console.error('[V4SE] startRing onExpire failed:', err); nextQuestion(); }
+  }, seconds*1000);
+}
+
+// Freezes the countdown + playback + mic exactly where they are, without
+// losing progress. Resume continues from here rather than restarting.
+function pauseRing(){
+  clearTimeout(state.timer); state.timer=null;
+  clearInterval(state.ringTimer); state.ringTimer=null;
+  const ring = document.getElementById('ringFg');
+  if(ring){
+    try{
+      const frozenOffset = getComputedStyle(ring).strokeDashoffset;
+      ring.style.transition = 'none';
+      ring.style.strokeDashoffset = frozenOffset;
+    }catch(e){}
+  }
+  if('speechSynthesis' in window){ try{ window.speechSynthesis.pause(); }catch(e){} }
+  if(state.recognition){
+    state.wasListening = true;
+    try{ state.recognition.stop(); }catch(e){}
+  }
+}
+
+// Continues a paused question: resumes speech synthesis, restarts the
+// countdown with whatever time was left (state.ringRemaining/ringOnExpire,
+// set by startRing and left untouched by pauseRing), and — since the Web
+// Speech API has no real pause/resume — restarts mic listening from
+// scratch if it was actively listening when paused. If there's nothing to
+// resume (fresh question, never started), falls back to activateFn().
+function resumeRing(){
+  if('speechSynthesis' in window){ try{ window.speechSynthesis.resume(); }catch(e){} }
+  if(state.ringOnExpire && state.ringRemaining > 0){
+    startRing(state.ringRemaining, state.ringOnExpire);
+    if(state.wasListening && state.listeningArgs){
+      state.wasListening = false;
+      beginSpeakingCapture(state.listeningArgs.targetText, state.listeningArgs.info, state.listeningArgs.buildCorrect, state.listeningArgs.acceptList);
+    }
+  } else if(state.activateFn){
+    state.activateFn();
+  }
+}
+
+// ================== Session Start/Pause + audio-check gate ==================
+function allChecksPassed(){
+  return state.checklist.sound === true && state.checklist.mic === true && state.checklist.level === true;
+}
+
+function syncSessionControls(){
+  const btn = document.getElementById('sessionToggleBtn');
+  const hint = document.getElementById('sessionHint');
+  if(!btn) return;
+  const ok = allChecksPassed();
+  // Audio checks always take priority: the Start button stays locked (and,
+  // if the checks somehow become un-passed again, this also re-locks it)
+  // regardless of what state the session itself is in.
+  if(!ok) btn.disabled = true;
+  else if(!state.running) btn.disabled = false;
+  if(hint){
+    hint.textContent = ok
+      ? 'Sẵn sàng — bấm để bắt đầu / tạm dừng phiên luyện.'
+      : 'Hoàn thành ✓ Đạt cho cả 3 bước kiểm tra âm thanh ở trên để bắt đầu.';
+  }
+  updateSessionButtonLabel();
+}
+
+function updateSessionButtonLabel(){
+  const btn = document.getElementById('sessionToggleBtn');
+  if(!btn) return;
+  if(!state.running){
+    btn.textContent = '▶ Start Session';
+    btn.classList.remove('paused');
+  } else if(state.paused){
+    btn.textContent = '▶ Resume';
+    btn.classList.add('paused');
+  } else {
+    btn.textContent = '⏸ Pause';
+    btn.classList.remove('paused');
+  }
+}
+
+function syncPauseOverlay(){
+  const overlay = document.getElementById('pauseOverlay');
+  if(!overlay) return;
+  overlay.style.display = (state.running && !state.paused) ? 'none' : 'flex';
+}
+
+function toggleSession(){
+  if(!state.running){
+    if(!allChecksPassed()) return; // guarded again here — audio checks win over the button
+    state.running = true;
+    state.paused = false;
+    if(state.activateFn) state.activateFn();
+  } else if(state.paused){
+    state.paused = false;
+    resumeRing();
+  } else {
+    state.paused = true;
+    pauseRing();
+  }
+  updateSessionButtonLabel();
+  syncPauseOverlay();
+}
+
+
+function switchMode(mode){
+  if(state.examActive){
+    state.examActive = false;
+    document.getElementById('examBanner').style.display = 'none';
+    document.getElementById('examTab').classList.remove('active');
+  }
+  if(examResultData){ examResultData = null; renderSkillsBar(); } // back to normal cumulative % view
+  clearTimers();
+  state.mode = mode; state.order = shuffledIndices(mode); state.idx = 0;
+  document.querySelectorAll('.tab[data-mode]').forEach(t=>t.classList.toggle('active', t.dataset.mode===mode));
+  renderQuestion();
+}
+
+function nextQuestion(){
+  clearTimers();
+  state.idx++;
+  if(state.idx >= state.order.length){
+    if(state.examActive){ advanceExamPart(); return; }
+    renderSummary(); return;
+  }
+  renderQuestion();
+}
+
+function ringHtmlFor(info){
+  return `
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 120 120">
+        <circle class="ring-bg" cx="60" cy="60" r="52"/>
+        <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52" style="stroke:${info.ring}"/>
+      </svg>
+      <div class="ring-time" id="ringTime">${info.time}</div>
+    </div>`;
+}
+
+function renderQuestion(){
+  renderDots();
+  const info = MODE_INFO[state.mode];
+  const item = info.pool[state.order[state.idx]];
+  const card = document.getElementById('card');
+  const ringHtml = ringHtmlFor(info);
+
+  // Fresh question — nothing to resume yet, and no capture recorded yet.
+  // state.activateFn gets set by whichever mode block below runs; it's what
+  // Start/Resume calls to actually kick this question off.
+  state.activateFn = null;
+  state.ringOnExpire = null;
+  state.ringRemaining = 0;
+  state.captured = null;
+  state.wasListening = false;
+  state.listeningArgs = null;
+
+  if(state.mode==='repeat'){
+    const text = item.en;
+    card.innerHTML = `
+      <div class="mode-label">Repeat · Speaking</div>
+      ${ringHtml}
+      <div class="prompt-area">
+        <div class="hidden-hint" id="hh">Plays automatically — repeat it exactly. One timer for the whole question (${info.time}s), no button needed.</div>
+        <div class="sentence" id="sentenceReveal" style="display:none">${text}</div>
+      </div>
+      <div class="voice-tag" id="voiceTag"></div>
+      <div class="hint-panel" id="hintPanel"></div>
+      <div class="feedback" id="fb">🔊 Playing...</div>`;
+    state.lastPlayedItem = { en:text, vi:item.vi };
+    updateHintPanel();
+    // ONE countdown for the entire question, started the instant Start is
+    // pressed (or immediately if the session is already running). Nothing
+    // the user does clears or restarts it — audio playback and speech
+    // capture both happen inside this same window, and whatever was heard
+    // (or wasn't) by the time it hits 0 is what gets scored.
+    state.activateFn = ()=>{
+      startRing(info.time, ()=> finalizeSpeakingOnExpiry(text, info));
+      const v = speak(text, status=> applySpeechStatus('voiceTag', status), ()=> beginSpeakingCapture(text, info));
+      const vt = document.getElementById('voiceTag');
+      if(vt) vt.textContent = v ? `🔊 ${v.lang} — ${v.name}` : '🔊 default browser voice';
+    };
+  }
+
+  if(state.mode==='build'){
+    const shuffled = [...item.chunks].sort(()=>Math.random()-0.5);
+    let picked = [];
+    let capturePhaseStarted = false;
+    card.innerHTML = `
+      <div class="mode-label">Sentence Build · Speaking</div>
+      ${ringHtml}
+      <div class="prompt-area">
+        <div class="hidden-hint">Arrange the word groups in order, then say the full sentence — one timer for the whole question (${info.time}s)</div>
+        <div class="chunk-answer" id="answerRow"></div>
+        <div class="divider"></div>
+        <div class="chunk-pool" id="poolRow"></div>
+      </div>
+      <div class="controls">
+        <button class="btn secondary" id="resetChunks">↺ Reset order</button>
+      </div>
+      <div class="hint-panel" id="hintPanel"></div>
+      <div class="feedback" id="fb"></div>`;
+    state.lastPlayedItem = { en:item.answer, vi:item.vi };
+    updateHintPanel();
+    // ONE countdown for the entire question — arranging the chunks AND
+    // speaking both happen inside it; nothing the user clicks resets it.
+    // (Chunk clicks are inert until the pause overlay is hidden, i.e. until
+    // Start/Resume has actually kicked this question off.)
+    state.activateFn = ()=> startRing(info.time, ()=> finalizeSpeakingOnExpiry(item.answer, info));
+
+    function renderRows(){
+      document.getElementById('answerRow').innerHTML = picked.map(c=>`<div class="chunk">${c}</div>`).join('') || '<span class="hidden-hint">no chunks selected yet</span>';
+      const remaining = shuffled.filter(c=>!picked.includes(c));
+      document.getElementById('poolRow').innerHTML = remaining.map(c=>`<div class="chunk" data-c="${c}">${c}</div>`).join('');
+      document.querySelectorAll('#poolRow .chunk').forEach(el=>{
+        el.onclick = ()=>{
+          if(capturePhaseStarted) return; // arrangement locks in once speaking capture begins
+          picked.push(el.dataset.c); renderRows();
+          if(picked.length === item.chunks.length){
+            capturePhaseStarted = true;
+            const correctOrder = picked.join(' ') === item.chunks.join(' ');
+            const fb = document.getElementById('fb');
+            if(fb){
+              fb.textContent = correctOrder ? '✓ Correct order! Now say it aloud...' : `✗ Wrong order. Correct sentence: "${item.answer}" — say it aloud anyway to keep practicing.`;
+              fb.className = 'feedback ' + (correctOrder ? 'ok':'bad');
+            }
+            // Auto-advances into speaking capture — no confirm button to press.
+            setTimeout(()=> beginSpeakingCapture(item.answer, info, correctOrder), 1200);
+          }
+        };
+      });
+    }
+    renderRows();
+    document.getElementById('resetChunks').onclick = ()=>{
+      if(capturePhaseStarted) return;
+      picked=[]; renderRows();
+    };
+  }
+
+  if(state.mode==='conversations'){
+    card.innerHTML = `
+      <div class="mode-label">Conversations · Listening</div>
+      ${ringHtml}
+      <div class="prompt-area">
+        <div class="hidden-hint" id="hh">Plays automatically — the question appears once it ends, answer briefly. One timer for the whole question (${info.time}s).</div>
+      </div>
+      <div class="voice-tag" id="voiceTag">🔊 Playing conversation...</div>
+      <div class="dialogue" id="dialogueBox" style="display:none"></div>
+      <div class="prompt-area" id="qArea" style="display:none">
+        <div class="sentence" id="qText"></div>
+      </div>
+      <div class="hint-panel" id="hintPanel"></div>
+      <div class="feedback" id="fb"></div>`;
+    updateHintPanel(); // keep showing the previous item's hint until this one is actually played
+    // ONE countdown for the entire question — conversation playback, the
+    // question reveal, and speech capture all happen inside it.
+    state.activateFn = ()=>{
+      startRing(info.time, ()=> finalizeSpeakingOnExpiry(item.answers[0], info));
+      let convOk = true;
+      speakSequential(item.lines, ()=>{
+        document.getElementById('dialogueBox').style.display='block';
+        document.getElementById('dialogueBox').innerHTML = item.lines.map(l=>{
+          const [sp, ...rest] = l.split(':');
+          return `<div class="ln"><span class="sp">${sp}:</span>${rest.join(':')}</div>`;
+        }).join('');
+        if(convOk) document.getElementById('voiceTag').textContent = '';
+        document.getElementById('qArea').style.display='flex';
+        document.getElementById('qText').textContent = item.question;
+        state.lastPlayedItem = { en:`${item.question} → ${item.answers[0]}`, vi:item.vi };
+        updateHintPanel();
+        setTimeout(()=> beginSpeakingCapture(item.answers[0], info, undefined, item.answers), 500);
+      }, status=>{
+        if(status!=='ok') convOk = false;
+        applySpeechStatus('voiceTag', status);
+      });
+    };
+  }
+
+  if(state.mode==='completion'){
+    card.innerHTML = `
+      <div class="mode-label">Sentence Completion · Reading</div>
+      ${ringHtml}
+      <div class="prompt-area">
+        <div class="sentence">${item.blankTpl}</div>
+        <div class="hidden-hint">Type the one word that best fits the blank</div>
+      </div>
+      <div class="prompt-area">
+        <input type="text" id="compInput" placeholder="Type one word..." autocomplete="off">
+        <div class="controls"><button class="btn" id="submitComp">Submit answer</button></div>
+      </div>
+      <div class="hint-panel" id="hintPanel"></div>
+      <div class="feedback" id="fb"></div>`;
+    state.lastPlayedItem = { en:item.blankTpl.replace('___', item.answers[0]), vi:item.vi };
+    updateHintPanel();
+    document.getElementById('compInput').focus();
+    document.getElementById('submitComp').onclick = ()=> submitCompletion(item, info, document.getElementById('compInput').value, false);
+    document.getElementById('compInput').addEventListener('keydown', e=>{ if(e.key==='Enter') submitCompletion(item, info, document.getElementById('compInput').value, false); });
+    state.activateFn = ()=> startRing(info.time, ()=> submitCompletion(item, info, null, true));
+  }
+
+  if(state.mode==='dictation'){
+    card.innerHTML = `
+      <div class="mode-label">Dictation · Listening + Writing</div>
+      ${ringHtml}
+      <div class="prompt-area">
+        <div class="hidden-hint" id="hh">Plays automatically — type exactly what you hear. One timer for the whole question (${info.time}s).</div>
+      </div>
+      <div class="voice-tag" id="voiceTag">🔊 Playing...</div>
+      <div class="prompt-area" id="typeArea" style="display:none">
+        <input type="text" id="typeInput" placeholder="Type what you just heard..." autocomplete="off">
+        <div class="controls"><button class="btn" id="submitType">Lock in answer</button></div>
+      </div>
+      <div class="hint-panel" id="hintPanel"></div>
+      <div class="feedback" id="fb"></div>`;
+    updateHintPanel(); // keep showing the previous sentence's hint until this one is actually played
+    // ONE countdown for the entire question — playback and typing both
+    // happen inside it. "Lock in answer" just records what's typed so far;
+    // it does not stop the clock. Whatever's captured (or typed live) when
+    // the timer hits 0 is what gets scored, then it moves on automatically.
+    state.activateFn = ()=>{
+      startRing(info.time, ()=>{
+        const typeArea = document.getElementById('typeArea');
+        const audioNeverFinished = !typeArea || typeArea.style.display === 'none';
+        const liveInput = document.getElementById('typeInput');
+        const val = state.captured !== null ? state.captured : (liveInput ? liveInput.value : null);
+        submitDictation(item, info, audioNeverFinished, val);
+      });
+      const v = speak(item.en, status=> applySpeechStatus('voiceTag', status), ()=>{
+        const typeArea = document.getElementById('typeArea');
+        if(typeArea) typeArea.style.display='flex';
+        const input = document.getElementById('typeInput');
+        if(input) input.focus();
+        const btn = document.getElementById('submitType');
+        if(btn) btn.onclick = ()=>{
+          state.captured = input ? input.value : '';
+          btn.disabled = true;
+          if(input) input.disabled = true;
+          const fb = document.getElementById('fb');
+          if(fb){ fb.textContent = 'Answer locked in — waiting for timer...'; fb.className = 'feedback'; }
+        };
+      });
+      const vt = document.getElementById('voiceTag');
+      if(vt) vt.textContent = v ? `🔊 ${v.lang} — ${v.name}` : '🔊 default browser voice';
+      state.lastPlayedItem = { en:item.en, vi:item.vi };
+      updateHintPanel();
+    };
+  }
+
+  if(state.mode==='passage'){
+    card.innerHTML = `
+      <div class="mode-label">Passage Reconstruction · Reading + Writing</div>
+      ${ringHtml}
+      <div class="hidden-hint" id="hh">Read the passage carefully for ${info.time} seconds — it will then disappear</div>
+      <div class="passage-box" id="passageBox">${item.en}</div>
+      <div class="hint-panel" id="hintPanel"></div>
+      <div class="feedback" id="fb"></div>`;
+    state.lastPlayedItem = { en:item.en, vi:item.vi, summary:item.summary, summaryVi:item.summaryVi };
+    updateHintPanel();
+    state.activateFn = ()=> startRing(info.time, ()=> startPassageWriting(item, info));
+  }
+
+  // Pause overlay — re-created fresh on every render since card.innerHTML
+  // above just wiped out any previous one. Blocks all interaction with the
+  // card (ring, buttons, chunk clicks, typing) until the session is
+  // actually running (audio checks passed + Start pressed + not paused).
+  const overlay = document.createElement('div');
+  overlay.className = 'pause-overlay';
+  overlay.id = 'pauseOverlay';
+  overlay.innerHTML = state.running
+    ? `<div class="pause-overlay-inner">⏸ Paused<span>Tap to continue</span></div>`
+    : `<div class="pause-overlay-inner">▶ Ready<span>Complete the 3 audio checks above, then tap Start Session</span></div>`;
+  overlay.onclick = ()=> toggleSession();
+  card.appendChild(overlay);
+
+  if(state.running && !state.paused && state.activateFn){
+    state.activateFn();
+  }
+  syncPauseOverlay();
+}
+
+function updateHintPanel(){
+  const panel = document.getElementById('hintPanel');
+  if(!panel) return;
+  panel.classList.toggle('open', state.hintOpen);
+  const wrap = state.lastPlayedItem;
+  if(!wrap){
+    panel.innerHTML = `<div class="hp-row" style="color:var(--muted)">No item to reference yet.</div>`;
+    return;
+  }
+  panel.innerHTML = `
+    <div class="hp-row"><span class="hp-tag">EN</span>${wrap.en}</div>
+    <div class="hp-row"><span class="hp-tag">VI</span>${wrap.vi}</div>` +
+    (wrap.summary ? `
+    <div class="divider" style="margin:8px 0"></div>
+    <div class="hp-row"><span class="hp-tag">SUMMARY</span>${wrap.summary}</div>
+    <div class="hp-row"><span class="hp-tag">TÓM TẮT</span>${wrap.summaryVi}</div>` : '');
+}
+
+function submitCompletion(item, info, typed, timedOut){
+  clearTimers();
+  try{
+    const val = normWord(typed);
+    const correct = !timedOut && item.answers.some(a=> normWord(a)===val);
+    recordScore('reading', correct);
+    const fb = document.getElementById('fb');
+    if(fb){
+      fb.className = 'feedback ' + (correct ? 'ok':'bad');
+      fb.textContent = timedOut ? `⏱ Time's up. Answer: "${item.answers[0]}"` : (correct ? '✓ Correct!' : `✗ Incorrect. Answer: "${item.answers[0]}"`);
+    }
+    const btn = document.getElementById('submitComp');
+    if(btn) btn.disabled = true;
+  }catch(err){ console.error('[V4SE] submitCompletion error:', err); }
+  setTimeout(nextQuestion, 1600);
+}
+
+function submitDictation(item, info, timedOut, typedValue){
+  clearTimers();
+  try{
+    const fallback = document.getElementById('typeInput');
+    const val = timedOut ? '' : (typedValue != null ? typedValue : (fallback ? fallback.value : ''));
+    const acc = accuracy(item.en, val);
+    const good = acc >= 0.85;
+    recordScore('listening', good);
+    recordScore('writing', good);
+    const fb = document.getElementById('fb');
+    if(fb){
+      fb.className = 'feedback ' + (good ? 'ok':'bad');
+      fb.textContent = timedOut ? `⏱ Time's up. Correct sentence: "${item.en}"` : `${good? '✓ Pass':'✗ Not yet'} — match ${Math.round(acc*100)}% · Correct sentence: "${item.en}"`;
+    }
+  }catch(err){ console.error('[V4SE] submitDictation error:', err); }
+  setTimeout(nextQuestion, 1800);
+}
+
+// Records whatever is heard/self-reported into state.captured for the
+// question's single countdown (started back in renderQuestion) to pick up
+// when it expires. Does NOT touch the timer and does NOT advance the
+// question itself — only that one countdown does that, per question.
+function beginSpeakingCapture(targetText, info, buildCorrect, acceptList){
+  const fb = document.getElementById('fb');
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if(SR){
+    if(fb){ fb.textContent = '🎙 Listening...'; fb.className = 'feedback'; }
+    ensureMicPermission(()=>{
+      try{
+        const rec = new SR();
+        state.recognition = rec;
+        rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
+        rec.onresult = (e)=>{
+          const said = e.results[0][0].transcript;
+          state.captured = { said, buildCorrect, acceptList };
+          releaseSharedMic();
+          if(fb){ fb.textContent = `Heard: "${said}" — locked in, waiting for timer...`; fb.className = 'feedback'; }
+        };
+        rec.onerror = ()=> showSelfReport(targetText, info, buildCorrect, acceptList);
+        rec.onend = ()=> releaseSharedMic();
+        rec.start();
+      }catch(e){ showSelfReport(targetText, info, buildCorrect, acceptList); }
+    }, ()=> showSelfReport(targetText, info, buildCorrect, acceptList));
+    return;
+  }
+  showSelfReport(targetText, info, buildCorrect, acceptList);
+}
+
+function showSelfReport(targetText, info, buildCorrect, acceptList){
+  const fb = document.getElementById('fb');
+  if(!fb) return;
+  fb.innerHTML = `Your browser doesn't support speech recognition — say the sentence aloud, then self-check:<br>
+    <div class="controls" style="margin-top:8px">
+      <button class="btn" id="selfOk">✓ I said it correctly</button>
+      <button class="btn secondary" id="selfBad">✗ I said it wrong</button>
+    </div>`;
+  const lock = (said)=>{
+    state.captured = { said, buildCorrect, acceptList };
+    fb.innerHTML = said ? '✓ Marked correct — waiting for timer...' : '✗ Marked wrong — waiting for timer...';
+  };
+  document.getElementById('selfOk').onclick = ()=> lock(targetText);
+  document.getElementById('selfBad').onclick = ()=> lock('');
+}
+
+// Called only from a question's single countdown when it hits 0. Reads
+// whatever beginSpeakingCapture/showSelfReport recorded (or null if the
+// user never got a result in time) and finalizes scoring + advances.
+function finalizeSpeakingOnExpiry(targetText, info){
+  const c = state.captured;
+  finishSpeaking(targetText, info, c ? c.said : null, c ? c.buildCorrect : undefined, !c, c ? c.acceptList : undefined);
+}
+
+function finishSpeaking(targetText, info, said, buildCorrect, timedOut, acceptList){
+  clearTimers();
+  releaseSharedMic();
+  try{
+    let acc = 0;
+    if(said!==null){
+      if(acceptList && acceptList.length){
+        acc = Math.max(...acceptList.map(a=> accuracy(a, said)));
+      } else {
+        acc = accuracy(targetText, said);
+      }
+    }
+    let good = acc >= 0.6;
+    if(buildCorrect === false) good = false;
+    recordScore(info.skill, good && !timedOut);
+    const fb = document.getElementById('fb');
+    if(fb){
+      fb.className = 'feedback ' + (good && !timedOut ? 'ok':'bad');
+      fb.textContent = timedOut ? '⏱ Time\'s up.' : (said ? `You said: "${said}" — match ${Math.round(acc*100)}%` : '✗ Not recognized / incorrect.');
+    }
+  }catch(err){ console.error('[V4SE] finishSpeaking error:', err); }
+  setTimeout(nextQuestion, 3000);
+}
+
+function startPassageWriting(item, info){
+  document.getElementById('passageBox').style.display='none';
+  const card = document.getElementById('card');
+  const html = `
+    <div class="mode-label">Passage Reconstruction · Reading + Writing</div>
+    ${ringHtmlFor({ring:info.ring, time:info.writeTime})}
+    <div class="hidden-hint">The passage is now hidden — reconstruct it in your own words within ${info.writeTime} seconds</div>
+    <div class="prompt-area">
+      <textarea id="passageInput" placeholder="Reconstruct the passage in your own words..."></textarea>
+    </div>
+    <div class="controls"><button class="btn" id="submitPassage">Submit</button></div>
+    <div class="hint-panel" id="hintPanel"></div>
+    <div class="feedback" id="fb"></div>`;
+  card.innerHTML = html;
+  updateHintPanel();
+  document.getElementById('passageInput').focus();
+  startRing(info.writeTime, ()=> finishPassage(item, info, true));
+  document.getElementById('submitPassage').onclick = ()=> finishPassage(item, info, false);
+}
+
+function finishPassage(item, info, timedOut){
+  clearTimers();
+  const val = timedOut ? (document.getElementById('passageInput')?.value || '') : document.getElementById('passageInput').value;
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="mode-label">Passage Reconstruction · Self-check</div>
+    <div class="hidden-hint">Compare your writing with the original passage — content doesn't need to match word for word, just capture the main ideas.</div>
+    <div class="passage-box"><b>Original passage:</b><br>${item.en}</div>
+    <div class="passage-box"><b>You wrote:</b><br>${val ? val.replace(/</g,'&lt;') : '<i>(no content)</i>'}</div>
+    <div class="controls">
+      <button class="btn" id="selfOkP">✓ Captured the main ideas</button>
+      <button class="btn secondary" id="selfBadP">✗ Missing a lot</button>
+    </div>
+    <div class="hint-panel" id="hintPanel"></div>
+    <div class="feedback" id="fb">${timedOut ? "⏱ Time's up." : ''}</div>`;
+  updateHintPanel();
+  document.getElementById('selfOkP').onclick = ()=>{ recordScore('reading', true); recordScore('writing', true); nextQuestion(); };
+  document.getElementById('selfBadP').onclick = ()=>{ recordScore('reading', false); recordScore('writing', false); nextQuestion(); };
+}
+
+function renderSummary(){
+  const info = MODE_INFO[state.mode];
+  const s = scores[info.skill];
+  const pct = s.total ? Math.round(100*s.correct/s.total) : 0;
+  document.getElementById('card').innerHTML = `
+    <div class="summary">
+      <div class="mode-label">${info.label} · Round complete</div>
+      <h2>${info.label} skill result</h2>
+      <div class="big">${pct}%</div>
+      <div class="hidden-hint">${s.correct}/${s.total} correct since the start of this session (cumulative)</div>
+      <div class="controls" style="margin-top:16px">
+        <button class="btn" id="replay">↺ Replay this round</button>
+      </div>
+    </div>`;
+  document.getElementById('progressDots').innerHTML='';
+  document.getElementById('replay').onclick = ()=> switchMode(state.mode);
+}
+
+// ================== VERSANT EXAM — full timed simulation ==================
+function startExam(){
+  clearTimers();
+  examStartSnapshot = JSON.parse(JSON.stringify(scores));
+  if(examResultData){ examResultData = null; renderSkillsBar(); } // show live cumulative % again while this attempt runs
+  state.examActive = true;
+  state.examSeqIdx = 0;
+  document.querySelectorAll('.tab[data-mode]').forEach(t=>t.classList.remove('active'));
+  document.getElementById('examTab').classList.add('active');
+  loadExamPart();
+}
+
+function loadExamPart(){
+  const part = EXAM_SEQUENCE[state.examSeqIdx];
+  state.mode = part.mode;
+  state.order = shuffledIndices(part.mode, part.count);
+  state.idx = 0;
+  updateExamBanner();
+  renderQuestion();
+}
+
+function updateExamBanner(){
+  const part = EXAM_SEQUENCE[state.examSeqIdx];
+  const info = MODE_INFO[part.mode];
+  const banner = document.getElementById('examBanner');
+  banner.style.display = 'block';
+  banner.textContent = `🎓 V4SE EXAM — Part ${state.examSeqIdx+1}/${EXAM_SEQUENCE.length}: ${info.label} (${part.count} questions)`;
+}
+
+function advanceExamPart(){
+  state.examSeqIdx++;
+  if(state.examSeqIdx >= EXAM_SEQUENCE.length){ renderExamSummary(); return; }
+  loadExamPart();
+}
+
+function renderExamSummary(){
+  state.examActive = false;
+  document.getElementById('examBanner').style.display = 'none';
+  document.getElementById('examTab').classList.remove('active');
+  const labels = {speaking:'🗣 Speaking', listening:'👂 Listening', reading:'📖 Reading', writing:'✍️ Writing'};
+  const skills = ['speaking','listening','reading','writing'];
+  let totalCorrect=0, totalCount=0;
+  const deltas = {};
+  const rows = skills.map(key=>{
+    const before = examStartSnapshot ? examStartSnapshot[key] : {correct:0,total:0};
+    const after = scores[key];
+    const dCorrect = after.correct - before.correct;
+    const dTotal = after.total - before.total;
+    deltas[key] = { correct: dCorrect, total: dTotal };
+    totalCorrect += dCorrect; totalCount += dTotal;
+    const pct = dTotal ? Math.round(100*dCorrect/dTotal) : 0;
+    return `<div class="exam-row-stat"><span>${labels[key]}</span><span>${dTotal ? pct+'%' : '—'} (${dCorrect}/${dTotal})</span></div>`;
+  }).join('');
+  const overallPct = totalCount ? Math.round(100*totalCorrect/totalCount) : 0;
+  // Switch the top skills bar from cumulative % to this exam attempt's own
+  // raw score (e.g. "13/16") plus its own CEFR estimate, per request.
+  examResultData = deltas;
+  renderSkillsBar();
+  document.getElementById('card').innerHTML = `
+    <div class="summary">
+      <div class="mode-label">V4SE EXAM · Full simulation complete</div>
+      <h2>Overall exam result</h2>
+      <div class="big">${overallPct}%</div>
+      <div class="hidden-hint">${totalCorrect}/${totalCount} correct across all 6 parts (this exam attempt)</div>
+      <div class="exam-breakdown">${rows}</div>
+      <div class="controls" style="margin-top:16px">
+        <button class="btn" id="retakeExam">↺ Retake Exam</button>
+        <button class="btn secondary" id="backToPractice">← Back to Practice</button>
+      </div>
+    </div>`;
+  document.getElementById('progressDots').innerHTML='';
+  document.getElementById('retakeExam').onclick = ()=> startExam();
+  document.getElementById('backToPractice').onclick = ()=> switchMode('repeat');
+}
+
+document.querySelectorAll('.tab[data-mode]').forEach(t=>{
+  t.addEventListener('click', ()=> switchMode(t.dataset.mode));
+});
+
+document.getElementById('hintTab').addEventListener('click', ()=>{
+  state.hintOpen = !state.hintOpen;
+  document.getElementById('hintTab').classList.toggle('on', state.hintOpen);
+  updateHintPanel();
+});
+
+document.getElementById('examTab').addEventListener('click', ()=> startExam());
+
+document.getElementById('testSoundBtn').addEventListener('click', ()=>{
+  const msg = document.getElementById('soundCheckMsg');
+  document.getElementById('soundConfirm').style.display = 'flex';
+  msg.textContent = '🔄 Testing sound...';
+  speak('This is a test. Can you hear this sentence?', (status, detail)=>{
+    if(status==='ok') msg.textContent = '✅ Sound is working on this device.';
+    else if(status==='unsupported') msg.textContent = '❌ This browser has no text-to-speech support — please use Chrome or Edge.';
+    else if(status==='error'){
+      const hint = detail ? ` (${detail})` : '';
+      msg.textContent = `⚠️ Speech error${hint} — if this app is open in more than one browser tab, close the extra tabs (they fight over the shared speech engine). Otherwise check system volume or try Chrome/Edge.`;
+    }
+    else if(status==='silent') msg.textContent = '⚠️ Still no sound after retrying — check: (1) system volume + correct output device selected, (2) this browser tab isn\'t muted, (3) Windows Settings → Time & Language → Speech → Manage voices has an English voice installed. Then tap Test Sound again.';
+  });
+});
+
+document.getElementById('testMicBtn').addEventListener('click', ()=>{
+  const msg = document.getElementById('micCheckMsg');
+  document.getElementById('micConfirm').style.display = 'flex';
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    msg.textContent = '❌ This browser has no speech-recognition support — Repeat/Sentence Build will use the manual self-check fallback instead (you still speak aloud, then mark ✓/✗ yourself).';
+    return;
+  }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    msg.textContent = '❌ This browser cannot access a microphone at all here.';
+    return;
+  }
+  msg.textContent = '🎙 Requesting microphone access...';
+  ensureMicPermission(()=>{
+    msg.textContent = '🎙 Listening... say a short sentence now (e.g. "This is a microphone test")';
+    try{
+      const rec = new SR();
+      rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 1;
+      let done = false;
+      let audioStarted = false; // mic stream/hardware connected at all
+      let soundStarted = false; // some audio volume was detected (could be noise, not necessarily speech)
+      const finish = ()=>{ if(done) return; done = true; };
+      rec.onaudiostart = ()=>{ audioStarted = true; };
+      rec.onsoundstart = ()=>{ soundStarted = true; };
+      rec.onresult = (e)=>{
+        finish();
+        const said = e.results[0][0].transcript;
+        msg.textContent = `✅ Microphone is working — heard: "${said}"`;
+      };
+      rec.onerror = (e)=>{
+        finish();
+        const reason = e && e.error;
+        if(reason === 'not-allowed' || reason === 'service-not-allowed'){
+          msg.textContent = '❌ Microphone access was blocked — click the 🔒/ⓘ icon in the address bar and allow microphone for this file, then try again.';
+        } else if(reason === 'network'){
+          msg.textContent = '❌ Network error reaching the speech-recognition service — this needs internet access to Google\'s servers; if this network/firewall blocks it, automatic mic scoring won\'t work here (the app already falls back to manual self-check, so practice still works — you just mark ✓/✗ yourself).';
+        } else if(reason === 'no-speech'){
+          if(audioStarted && !soundStarted){
+            msg.textContent = '⚠️ Mic connected, but no audio volume detected at all — this usually means Windows is using a DIFFERENT microphone than your headset (e.g. built-in laptop mic). Check Windows Settings → System → Sound → Input, set your headset as the input device, then try again.';
+          } else if(audioStarted && soundStarted){
+            msg.textContent = '⚠️ Mic picked up some sound but not recognizable speech — try speaking closer to the mic, a bit louder, right after tapping the button, then try again.';
+          } else {
+            msg.textContent = '⚠️ No speech detected — check your headset mic is the selected input device in Windows Sound settings, then try again and speak right after tapping.';
+          }
+        } else if(reason === 'audio-capture'){
+          msg.textContent = '❌ No microphone found — check your headset is plugged in / selected as the default recording device in Windows.';
+        } else {
+          msg.textContent = `⚠️ Microphone error (${reason || 'unknown'}) — try again, or check Windows Sound settings for your headset mic.`;
+        }
+      };
+      rec.onend = ()=>{ finish(); releaseSharedMic(); };
+      rec.start();
+    }catch(e){
+      msg.textContent = '❌ Could not start the microphone — try again, or check Windows Sound settings for your headset mic.';
+    }
+  }, ()=>{
+    msg.textContent = '❌ Microphone access was blocked or denied — click the 🔒/ⓘ icon in the address bar to allow microphone for this file, then try again.';
+  });
+});
+
+// Raw signal-level meter, bypassing Google's speech-recognition service
+// entirely. This measures actual audio arriving in the browser from the
+// selected mic — useful to tell apart "Bluetooth headset mic isn't sending
+// any signal to Windows/the browser" (hardware/OS/Bluetooth issue) from
+// "signal arrives fine but the online recognizer fails" (network issue).
+document.getElementById('micLevelBtn').addEventListener('click', ()=>{
+  const msg = document.getElementById('micLevelMsg');
+  document.getElementById('levelConfirm').style.display = 'flex';
+  const fill = document.getElementById('micLevelFill');
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    msg.textContent = '❌ This browser cannot access a microphone here.';
+    return;
+  }
+  msg.textContent = '🎚 Measuring for 5s — speak into your mic now...';
+  ensureMicPermission(()=>{
+  const stream = sharedMicStream;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AC();
+    const source = ctx.createMediaStreamSource(stream);
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    source.connect(analyser);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    let maxLevel = 0;
+    const start = Date.now();
+    function tick(){
+      analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for(let i=0;i<data.length;i++){ const v = (data[i]-128)/128; sum += v*v; }
+      const rms = Math.sqrt(sum/data.length);
+      maxLevel = Math.max(maxLevel, rms);
+      fill.style.width = Math.min(100, rms*400) + '%';
+      if(Date.now()-start < 5000){
+        requestAnimationFrame(tick);
+      } else {
+        ctx.close();
+        releaseSharedMic();
+        fill.style.width = '0%';
+        const peakPct = Math.round(Math.min(100, maxLevel*400));
+        if(maxLevel < 0.02){
+          msg.textContent = `⚠️ Peak level: ${peakPct}% — essentially silent. The browser isn't receiving any real signal from this mic. Bluetooth headsets are a common cause: Windows has to switch the headset from music-quality mode to call-quality mode to enable the mic, and that switch sometimes fails to deliver audio to apps. Try: open the Headset row in Windows Sound settings and check if ITS built-in "Test your microphone" bar also stays flat; if so, try a wired mic, or re-pair the Bluetooth headset.`;
+        } else if(maxLevel < 0.08){
+          msg.textContent = `⚠️ Peak level: ${peakPct}% — very low but not zero. Try talking louder/closer to the mic, or raise the mic input level/boost in Windows Sound settings → Headset → Levels.`;
+        } else {
+          msg.textContent = `✅ Peak level: ${peakPct}% — the browser IS receiving real audio from your mic. If speech still isn't recognized, it's most likely the online recognizer (needs internet to Google's servers) rather than the mic itself — the app's manual self-check fallback still works fine in that case.`;
+        }
+      }
+    }
+    tick();
+  }, ()=>{
+    msg.textContent = '❌ Could not access the microphone — permission denied or no mic available.';
+  });
+});
+
+// Each audio check needs an explicit self-confirmed ✓ Đạt / ✗ Chưa đạt —
+// running the test once isn't enough on its own. Đạt on all 3 is what
+// unlocks the Start Session button (see syncSessionControls/toggleSession).
+function wireCheckConfirm(okId, badId, key){
+  const okBtn = document.getElementById(okId);
+  const badBtn = document.getElementById(badId);
+  if(!okBtn || !badBtn) return;
+  okBtn.addEventListener('click', ()=>{
+    state.checklist[key] = true;
+    okBtn.classList.add('selected'); badBtn.classList.remove('selected');
+    syncSessionControls();
+  });
+  badBtn.addEventListener('click', ()=>{
+    state.checklist[key] = false;
+    badBtn.classList.add('selected'); okBtn.classList.remove('selected');
+    syncSessionControls();
+  });
+}
+wireCheckConfirm('soundOk', 'soundBad', 'sound');
+wireCheckConfirm('micOk', 'micBad', 'mic');
+wireCheckConfirm('levelOk', 'levelBad', 'level');
+
+document.getElementById('sessionToggleBtn').addEventListener('click', toggleSession);
+
+function initApp(){
+  renderSkillsBar();
+  syncSessionControls();
+  switchMode('repeat');
+}
+
+// ================== Access lock ==================
+// NOTE: this is a lightweight client-side gate for a private, single-file
+// training app — the password below is visible to anyone who views the
+// page source. It stops casual/accidental access, not a determined user.
+const ACCESS_PASSWORD = "versantb1";
+const UNLOCK_KEY = "versant_b1_unlocked";
+
+function unlockApp(){
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'block';
+  warmUpSpeech();
+  initApp();
+}
+
+function tryUnlock(){
+  const val = document.getElementById('lockInput').value;
+  if(val === ACCESS_PASSWORD){
+    try{ localStorage.setItem(UNLOCK_KEY, 'yes'); }catch(e){}
+    unlockApp();
+  } else {
+    document.getElementById('lockError').textContent = 'Incorrect password. Please try again.';
+    document.getElementById('lockInput').value = '';
+    document.getElementById('lockInput').focus();
+  }
+}
+
+document.getElementById('lockSubmit').addEventListener('click', tryUnlock);
+document.getElementById('lockInput').addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+
+let alreadyUnlocked = false;
+try{ alreadyUnlocked = localStorage.getItem(UNLOCK_KEY) === 'yes'; }catch(e){}
+if(alreadyUnlocked){
+  unlockApp();
+} else {
+  document.getElementById('lockInput').focus();
+}
+</script>
+</body>
+</html>
